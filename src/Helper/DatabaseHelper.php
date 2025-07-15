@@ -11,7 +11,7 @@ class DatabaseHelper
 
     function __construct()
     {
-        $this->updateSqlFile = storage_path('update-sql.json');
+        $this->updateSqlFile = storage_path('framework/sql.json');
     }
 
     public function updateDatabase(){
