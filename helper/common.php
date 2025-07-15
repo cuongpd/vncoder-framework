@@ -204,7 +204,6 @@ if (!function_exists('formBuilderManager')) {
 
             if($item['type'] == 'file' || $item['type'] == 'photo' || $item['type'] == 'video' || $item['type'] == 'audio') $hasFileInput = true;
             $item['required'] = isset($item['required']) && $item['required'] ? ' required' : '';
-            $item['multiple'] = isset($item['multiple']) && $item['multiple'] ? ' multiple' : '';
             if (!isset($item['value'])) $item['value'] = '';
             if (!isset($item['helper'])) $item['helper'] = '';
             if (!isset($item['type'])) $item['type'] = 'text';
@@ -212,6 +211,7 @@ if (!function_exists('formBuilderManager')) {
             if (!isset($item['label'])) $item['label'] = ucfirst($key);
             if (!isset($item['options'])) $item['options'] = [];
             if (!isset($item['placeholder'])) $item['placeholder'] = $item['label'];
+            $item['multiple'] = isset($item['multiple']) && $item['multiple'];
             if ($item['required']) $item['label'] .= ' (*)';
             if ($item['type'] == 'hidden') {
                 $html .= '<input type="hidden" name="' . $key . '" value="' . $item['value'] . '">';
@@ -262,7 +262,11 @@ if (!function_exists('formBuilderManager')) {
                     $html .= '<textarea class="form-control form-control-sm form-textarea border tinymce" ' . $textarea_rows . ' id="' . $key . '" name="' . $key . '" ' . $item['required'] . '>' . $item['value'] . '</textarea>';
                     break;
                 case 'select':
-                    $html .= '<select class="form-select form-select-sm border bs-select2" id="' . $key . '" name="' . $key . '" ' . $item['required'] . ' ' . $item['multiple'] . '>';
+                    if($item['multiple']){
+                        $html .= '<select class="form-select form-select-sm border bs-select2" id="' . $key . '" name="' . $key . '[]" multiple="multiple" ' . $item['required'] . '>';
+                    }else{
+                        $html .= '<select class="form-select form-select-sm border bs-select2" id="' . $key . '" name="' . $key . '" ' . $item['required'] . '>';
+                    }
                     $html .= '<option>Vui lòng chọn</option>';
                     foreach ($item['options'] as $o_value => $o_label) {
                         $selected = $o_value == $item['value'] ? 'selected' : '';
