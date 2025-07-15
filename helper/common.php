@@ -261,8 +261,8 @@ if (!function_exists('formBuilderManager')) {
                     $html .= '<textarea class="form-control form-control-sm form-textarea border tinymce" ' . $textarea_rows . ' id="' . $key . '" name="' . $key . '" ' . $item['required'] . '>' . $item['value'] . '</textarea>';
                     break;
                 case 'select':
-                    $html .= '<select class="form-select form-select-sm border" id="' . $key . '" name="' . $key . '" ' . $item['required'] . '>';
-                    $html .= '<option value="0">Vui lòng chọn</option>';
+                    $html .= '<select class="form-select form-select-sm border bs-select2" id="' . $key . '" name="' . $key . '" ' . $item['required'] . '>';
+                    $html .= '<option>Vui lòng chọn</option>';
                     foreach ($item['options'] as $o_value => $o_label) {
                         $selected = $o_value == $item['value'] ? 'selected' : '';
                         $html .= '<option value="' . $o_value . '" ' . $selected . '>' . $o_label . '</option>';

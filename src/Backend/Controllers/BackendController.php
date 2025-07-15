@@ -117,14 +117,13 @@ class BackendController extends VnController
 
     protected function initFormEditor()
     {
-        $this->initFlatpickr();
-        $this->initMaxlengthInput();
-        $this->initTinyMCE();
-    }
-
-    protected function initMaxlengthInput(){
+        $this->linkCSS('core/plugins/select2/select2.min.css');
+        $this->linkJS('core/plugins/select2/select2.min.js');
         $this->linkCSS('core/plugins/maxlength/bootstrap-maxlength.css');
         $this->linkJS('core/plugins/maxlength/bootstrap-maxlength.js');
+        $this->linkCSS('core/plugins/flatpickr/flatpickr.min.css');
+        $this->linkJS('core/plugins/flatpickr/flatpickr.min.js');
+        $this->linkJS('core/plugins/tinymce/tinymce.min.js');
     }
 
     protected function initFlatpickr()
@@ -133,19 +132,16 @@ class BackendController extends VnController
         $this->linkJS('core/plugins/flatpickr/flatpickr.min.js');
     }
 
-    protected function initTinyMCE()
-    {
-        $this->linkJS('core/plugins/tinymce/tinymce.min.js');
-    }
-
     protected function initCodeMirror()
     {
         $this->linkCSS('core/plugins/codemirror/codemirror.min.css');
         $this->linkJS('core/plugins/codemirror/codemirror.min.js');
     }
+
     protected function initClipboard(){
         $this->linkCSS('core/plugins/clipboard/clipboard.min.js');
     }
+    
     protected function initApexCharts()
     {
         $this->linkJS('core/plugins/apexcharts/apexcharts.min.js');

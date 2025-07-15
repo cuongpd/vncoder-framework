@@ -34,7 +34,7 @@ class VnCoderComposer extends Command
         // }
 
         // static core asset folder
-        $assetsFolder = VNCODER_CORE_PATH . 'public' . DIRECTORY_SEPARATOR . 'core';
+        $assetsFolder = VNCODER_CORE_PATH . 'assets';
         $assetsFolderSymlink = PUBLIC_PATH . 'core';
         if (!is_dir($assetsFolderSymlink)) {
             echo "Symlink folder " . $assetsFolder . " to ". $assetsFolderSymlink . "\n";
