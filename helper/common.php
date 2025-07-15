@@ -203,7 +203,8 @@ if (!function_exists('formBuilderManager')) {
             }
 
             if($item['type'] == 'file' || $item['type'] == 'photo' || $item['type'] == 'video' || $item['type'] == 'audio') $hasFileInput = true;
-            $item['required'] = isset($item['required']) && $item['required'] ? 'required' : '';
+            $item['required'] = isset($item['required']) && $item['required'] ? ' required' : '';
+            $item['multiple'] = isset($item['multiple']) && $item['multiple'] ? ' multiple' : '';
             if (!isset($item['value'])) $item['value'] = '';
             if (!isset($item['helper'])) $item['helper'] = '';
             if (!isset($item['type'])) $item['type'] = 'text';
@@ -261,7 +262,7 @@ if (!function_exists('formBuilderManager')) {
                     $html .= '<textarea class="form-control form-control-sm form-textarea border tinymce" ' . $textarea_rows . ' id="' . $key . '" name="' . $key . '" ' . $item['required'] . '>' . $item['value'] . '</textarea>';
                     break;
                 case 'select':
-                    $html .= '<select class="form-select form-select-sm border bs-select2" id="' . $key . '" name="' . $key . '" ' . $item['required'] . '>';
+                    $html .= '<select class="form-select form-select-sm border bs-select2" id="' . $key . '" name="' . $key . '" ' . $item['required'] . ' ' . $item['multiple'] . '>';
                     $html .= '<option>Vui lòng chọn</option>';
                     foreach ($item['options'] as $o_value => $o_label) {
                         $selected = $o_value == $item['value'] ? 'selected' : '';
