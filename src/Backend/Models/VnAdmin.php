@@ -32,7 +32,7 @@ class VnAdmin
     {
         $menu = [];
         $controllerLabel = self::formatControllerName($controller);
-        $slugBase = $module ? toKebabCase($module) . '/' . toKebabCase($controllerLabel) . '/' : toKebabCase($controllerLabel);
+        $slugBase = $module ? toKebabCase($module) . '/' . toKebabCase($controllerLabel) : toKebabCase($controllerLabel);
         $classContent = file_get_contents($file);
         if (self::extendsCrudController($classContent)) {
             $menu[] = [
@@ -45,7 +45,7 @@ class VnAdmin
 
             $menu[] = [
                 'name' => str_replace('_', ' ', $method),
-                'link' => strtolower($slugBase . ucwords(str_replace('_', '-', $method)))
+                'link' => strtolower($slugBase . '/' . ucwords(str_replace('_', '-', $method)))
             ];
         }
 
