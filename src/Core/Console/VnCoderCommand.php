@@ -37,7 +37,7 @@ class VnCoderCommand extends Command
             $actionName = "Index_Action";
         }else{
             $action = str_replace('-', ' ', $action);
-            $actionName = str_replace(' ', '', ucwords(str_replace('-', ' ', $action))) . '_Action';
+            $actionName = str_replace(' ', '_', ucwords(str_replace('-', ' ', $action))) . '_Action';
         }
 
         $commandController = 'App\\Admin\\Command\\' . $controllerName;
