@@ -228,6 +228,19 @@ div.phpdebugbar-header {padding-left: 0!important;}
     width: 200px; /* tuỳ chọn nếu bạn muốn giới hạn chiều rộng */
 }
 
+.choices .choices__inner {
+  min-height: calc(1.5em + 0.75rem + 2px);
+    padding: .375rem .7rem!important;
+    font-size: 0.765625rem;
+    border-radius: 6px;
+}
+
+.choices__input {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  height: auto;
+}
 
 
 @media all {

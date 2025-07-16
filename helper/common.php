@@ -191,7 +191,7 @@ if (!function_exists('formBuilderManager')) {
         $submitUrlAction = request()->url();
         $hasFileInput = false;
         $html = '<form class="form-data" id="form-data" method="POST" accept-charset="utf-8" enctype="multipart/form-data" action="'.$submitUrlAction.'">';
-        $html .= '<div class="row">';
+        $html .= '<div class="row align-items-stretch">';
         if ($csrf_token) {
             $html .= "\n" . csrf_field() . "\n";
         }
@@ -210,8 +210,9 @@ if (!function_exists('formBuilderManager')) {
             if (!isset($item['col'])) $item['col'] = 12;
             if (!isset($item['label'])) $item['label'] = ucfirst($key);
             if (!isset($item['options'])) $item['options'] = [];
-            if (!isset($item['placeholder'])) $item['placeholder'] = $item['label'];
-            $item['multiple'] = isset($item['multiple']) && $item['multiple'];
+            $item['placeholder'] = isset($item['placeholder']) ? $item['placeholder'] : $item['label'];
+
+
             if ($item['required']) $item['label'] .= ' (*)';
             if ($item['type'] == 'hidden') {
                 $html .= '<input type="hidden" name="' . $key . '" value="' . $item['value'] . '">';
@@ -223,8 +224,8 @@ if (!function_exists('formBuilderManager')) {
                     $html .= '<div class="row form-group mb-3">';
                     $html .= '<div class="col-sm-12">';
                 }else{
-                    $html .= '<div class="col-md-' . $item['col'] . '">';
-                    $html .= '<div class="form-group">';
+                    $html .= '<div class="col-md-' . $item['col'] . ' d-flex">';
+                    $html .= '<div class="form-group flex-fill">';
                 }
                 $html .= '<input type="hidden" name="' . $key . '" value="0">';
                 $checked = $item['value'] ? 'checked' : '';
@@ -242,7 +243,6 @@ if (!function_exists('formBuilderManager')) {
                 $html .= '<div class="form-group">';
                 $html .= '<label for="' . $key . '">' . $item['label'] . '</label>';
             }
-
 
             switch ($item['type']) {
                 case 'number':
@@ -262,12 +262,13 @@ if (!function_exists('formBuilderManager')) {
                     $html .= '<textarea class="form-control form-control-sm form-textarea border tinymce" ' . $textarea_rows . ' id="' . $key . '" name="' . $key . '" ' . $item['required'] . '>' . $item['value'] . '</textarea>';
                     break;
                 case 'select':
-                    if($item['multiple']){
-                        $html .= '<select class="form-select form-select-sm border bs-select2" id="' . $key . '" name="' . $key . '[]" multiple="multiple" ' . $item['required'] . '>';
+                    if(isset($item['multiple']) && $item['multiple']){
+                        $html .= '<select class="form-select form-select-sm js-choices" id="' . $key . '" name="' . $key . '[]" multiple ' . $item['required'] . '>';
                     }else{
-                        $html .= '<select class="form-select form-select-sm border bs-select2" id="' . $key . '" name="' . $key . '" ' . $item['required'] . '>';
+                        $js_choices = isset($item['choices']) && $item['choices'] ? ' js-choices' : '';
+                        $html .= '<select class="form-select form-select-sm '.$js_choices.'" id="' . $key . '" name="' . $key . '" ' . $item['required'] . '>';
+                        $html .= '<option value="" disabled selected>'.$item['placeholder'].'</option>';
                     }
-                    $html .= '<option>Vui lòng chọn</option>';
                     foreach ($item['options'] as $o_value => $o_label) {
                         $selected = $o_value == $item['value'] ? 'selected' : '';
                         $html .= '<option value="' . $o_value . '" ' . $selected . '>' . $o_label . '</option>';
@@ -297,10 +298,11 @@ if (!function_exists('formBuilderManager')) {
                     $html .= '<input type="file" class="form-control form-control-sm border" id="' . $key . '" name="' . $key . '" value="' . $item['value'] . '" ' . $item['required'] . ' accept=".doc, .docx, .pdf, .ppt, .pptx, .xls, .xlsx, .zip, .rar, .txt">';
                     break;
                 case 'date':
-                case 'time':
-                case 'datetime':
-                    $input_class = 'class="form-control form-control-sm border flatpickr-'.$item['type'].'"';
-                    $html .= '<input type="text" '.$input_class.' id="' . $key . '" name="' . $key . '" value="' . $item['value'] . '" ' . $item['required'] . '>';
+                case 'date-range':
+                case 'date-month':
+                case 'date-time':
+                    $input_class = 'class="form-control form-control-sm border air-'.$item['type'].'"';
+                    $html .= '<input type="text" '.$input_class.' id="' . $key . '" name="' . $key . '" value="' . $item['value'] . '" ' . $item['required'] . ' readonly>';
                     break;
                 case 'readonly':
                     $html .= '<input type="text" class="form-control form-control-sm border" id="' . $key . '" value="' . $item['value'] . '" readonly>';

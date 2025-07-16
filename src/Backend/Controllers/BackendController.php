@@ -117,12 +117,12 @@ class BackendController extends VnController
 
     protected function initFormEditor()
     {
-        $this->linkCSS('core/plugins/select2/select2.min.css');
-        $this->linkJS('core/plugins/select2/select2.min.js');
-        $this->linkCSS('core/plugins/maxlength/bootstrap-maxlength.css');
-        $this->linkJS('core/plugins/maxlength/bootstrap-maxlength.js');
-        $this->linkCSS('core/plugins/flatpickr/flatpickr.min.css');
-        $this->linkJS('core/plugins/flatpickr/flatpickr.min.js');
+        $this->linkCSS('core/plugins/form-ui/bootstrap-maxlength.css');
+        $this->linkCSS('core/plugins/form-ui/air-datepicker.css');
+        
+        $this->linkJS('core/plugins/form-ui/bootstrap-maxlength.js');
+        $this->linkJS('core/plugins/form-ui/air-datepicker.js');
+        $this->linkJS('core/plugins/form-ui/choices.min.js');
         $this->linkJS('core/plugins/tinymce/tinymce.min.js');
     }
 
