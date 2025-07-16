@@ -107,9 +107,7 @@ class BackendController extends VnController
     {
         // Enable Export Button
         if($buttonActive) $this->header('<script>const DATATABLE_EXPORT_BUTTON = true;</script>');
-        // Buttons | FixedHeader | Responsive | KeyTable | Select
         $this->linkCSS('core/plugins/data-tables/datatables/datatables.min.css');
-        $this->linkCSS('core/plugins/data-tables/style.css');
         $this->linkJS('core/plugins/data-tables/datatables/datatables.min.js');
         $this->linkJS('core/plugins/data-tables/init.js');
 
@@ -119,7 +117,7 @@ class BackendController extends VnController
     {
         $this->linkCSS('core/plugins/form-ui/bootstrap-maxlength.css');
         $this->linkCSS('core/plugins/form-ui/air-datepicker.css');
-        
+
         $this->linkJS('core/plugins/form-ui/bootstrap-maxlength.js');
         $this->linkJS('core/plugins/form-ui/air-datepicker.js');
         $this->linkJS('core/plugins/form-ui/choices.min.js');
