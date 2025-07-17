@@ -116,7 +116,7 @@ dataTableDefaults.columnDefs = [
         targets: "photo",
         render: function (data, type) {
             if (type === 'display' && data && (typeof data === 'string')) {
-                return `<img src="${data}" class="img-thumbnail hover-preview"style="max-height: 80px; cursor: zoom-in;" data-image="${data}" />`;
+                return '<img src="'+data+'" class="img-thumbnail dt-photo" style="max-height: 80px;" />';
             }
             return data;
         }
@@ -181,33 +181,3 @@ if (typeof DATATABLE_EXPORT_BUTTON !== 'undefined' && DATATABLE_EXPORT_BUTTON) {
 }
 
 $.extend($.fn.dataTable.defaults, dataTableDefaults);
-
-
-$(document).on('draw.dt', function () {
-    if (typeof tippy === 'function') {
-        tippy('.hover-preview', {
-            content(reference) {
-                const image_src = reference.getAttribute('data-image');
-                if (!image_src) return 'No image';
-                const img = document.createElement('img');
-                img.src = image_src;
-                img.style.width = '250px';
-                img.style.height = '250px';
-                img.style.objectFit = 'cover';
-                img.style.borderRadius = '2px';
-                img.style.boxShadow = '0 2px 2px rgba(0,0,0,0.2)';
-                img.style.border = '1px solid #ddd';
-                return img;
-            },
-            allowHTML: true,
-            theme: 'light',
-            animation: 'shift-away',
-            placement: 'right',
-            followCursor: true,
-            delay: [25, 50],
-            interactive: false,
-            arrow: false,
-            appendTo: document.body,
-        });
-    }
-});

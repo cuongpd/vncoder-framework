@@ -107,10 +107,11 @@ class BackendController extends VnController
     {
         // Enable Export Button
         if($buttonActive) $this->header('<script>const DATATABLE_EXPORT_BUTTON = true;</script>');
+        // Buttons | FixedHeader | Responsive | KeyTable | Select
         $this->linkCSS('core/plugins/data-tables/datatables/datatables.min.css');
+        $this->linkCSS('core/plugins/data-tables/style.css');
         $this->linkJS('core/plugins/data-tables/datatables/datatables.min.js');
         $this->linkJS('core/plugins/data-tables/init.js');
-
     }
 
     protected function initFormEditor()
