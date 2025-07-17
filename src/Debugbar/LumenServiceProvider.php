@@ -89,7 +89,7 @@ class LumenServiceProvider extends ServiceProvider
     {
         $this->registerMiddleware(InjectDebugbar::class);
         $this->commands(['command.debugbar.clear']);
-        $this->app->router->group(['namespace' => 'Barryvdh\Debugbar\Controllers', 'prefix' => app('config')->get('debugbar.route_prefix')], function ($router) {
+        $this->app->router->group(['namespace' => 'VnCoder\Debugbar\Controllers', 'prefix' => app('config')->get('debugbar.route_prefix')], function ($router) {
             $router->get('open', [
                 'uses' => 'OpenHandlerController@handle',
                 'as' => 'debugbar.openhandler',
