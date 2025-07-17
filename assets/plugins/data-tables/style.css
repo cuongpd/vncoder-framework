@@ -23,3 +23,6 @@ div.dt-wrapper-lf div.dt-search input{width:100%;max-width: 320px;float: right}
 th.dtfc-fixed-left, td.dtfc-fixed-left, th.dtfc-fixed-right, td.dtfc-fixed-right {
     border: none !important;
 }
+div.dt-container.dt-empty-footer tbody > tr:last-child > * {
+    border-bottom: none !important;
+}
