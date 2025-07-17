@@ -33,7 +33,7 @@ class VnAdmin
         $menu = [];
         $controllerLabel = self::formatControllerName($controller);
         $slugBase = $module ? toKebabCase($module) . '/' . toKebabCase($controllerLabel) : toKebabCase($controllerLabel);
-        $classContent = file_get_contents($file);
+        $classContent = get_contents($file);
         if (self::extendsCrudController($classContent)) {
             $menu[] = [
                 'name' => "$controllerLabel Manager",

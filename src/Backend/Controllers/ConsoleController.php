@@ -20,10 +20,9 @@ class ConsoleController extends BackendController
     protected function getListCommand(){
         $commands = [];
         foreach (glob(COMMAND_PATH . '*Command.php') as $filePath) {
-            $fileName = basename($filePath, '.php'); // Ví dụ: AiAgentCommand
-            $controller = toKebabCase(str_replace('Command', '', $fileName)); // -> ai-agent
-
-            $content = file_get_contents($filePath);
+            $fileName = basename($filePath, '.php');
+            $controller = toKebabCase(str_replace('Command', '', $fileName));
+            $content = get_contents($filePath);
             if (preg_match_all('/public function (\w+)_Action\s*\(/', $content, $matches)) {
                 foreach ($matches[1] as $actionRaw) {
                     $action = ($actionRaw === 'index') ? '' : toKebabCase($actionRaw);

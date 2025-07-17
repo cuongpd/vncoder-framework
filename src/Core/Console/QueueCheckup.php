@@ -34,12 +34,12 @@ class QueueCheckup extends Command
         if (! file_exists(storage_path($this->pidQueue))) {
             return false;
         }
-        return file_get_contents(storage_path($this->pidQueue));
+        return get_contents(storage_path($this->pidQueue));
     }
 
     private function saveQueueListenerPID($pid)
     {
-        file_put_contents(storage_path($this->pidQueue), $pid);
+        put_contents(storage_path($this->pidQueue), $pid);
     }
 
     private function startQueueListener()
