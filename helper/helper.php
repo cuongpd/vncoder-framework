@@ -537,6 +537,32 @@ if(!function_exists('isLocalDomain')){
 }
 
 
+if (!function_exists('get_contents')) {
+    function get_contents($filename) {
+        if(file_exists($filename)){
+            return file_get_contents($filename);
+        }
+        return "";
+    }
+}
+
+if (!function_exists('put_contents')) {
+    function put_contents($path, $data, $flags = 0){
+        $directory = dirname($path);
+        if (!is_dir($directory)) {
+            if (!mkdir($directory, 0777, true)) {
+                throw new \RuntimeException("Failed to create directory: $directory");
+            }
+        }
+        $bytesWritten = file_put_contents($path, $data, $flags);
+        if ($bytesWritten === false) {
+            throw new \RuntimeException("Failed to write to file: $path");
+        }
+        return $bytesWritten;
+    }
+}
+
+
 // Debugbar
 if (!function_exists('debugbar')) {
     function debugbar()
