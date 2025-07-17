@@ -7,12 +7,6 @@ use Illuminate\Support\Facades\DB;
 class DatabaseHelper
 {
     protected string $message = '';
-    protected string $updateSqlFile = '';
-
-    function __construct()
-    {
-        $this->updateSqlFile = storage_path('framework/sql.json');
-    }
 
     public function updateDatabase(){
         $currentDatabase = $this->getCurrentDatabase();
@@ -48,14 +42,15 @@ class DatabaseHelper
 
     public function saveCurrentDatabase(){
         $tableData = $this->getCurrentDatabase();
-        file_put_contents($this->updateSqlFile, json_encode($tableData));
+        file_put_contents(storage_path('vncoder/update-sql.json'), json_encode($tableData));
     }
 
     public function getUpdateDatabase(){
-        if(!file_exists($this->updateSqlFile)){
+        $sqlUpdate = storage_path('vncoder/update-sql.json');
+        if(!file_exists($sqlUpdate)){
             return [];
         }
-        return json_decode(file_get_contents($this->updateSqlFile), true);
+        return json_decode(file_get_contents($sqlUpdate), true);
     }
 
     public function getMessage(){

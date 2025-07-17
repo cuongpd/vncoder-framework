@@ -1,19 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Log;
+use JetBrains\PhpStorm\NoReturn;
 use VnCoder\Core\Queue\SendEmailQueue;
 use VnCoder\Helper\GeoIP\Reader;
 use VnCoder\Helper\QRCode;
 use VnCoder\Models\VnConfig;
 
 if(!function_exists('dp')){
+    #[NoReturn]
     function dp($data){
         echo '<pre>';
         print_r($data);
         echo '</pre>';
         exit(1);
     }
-
 }
 
 if (!function_exists('newObject')) {
@@ -485,34 +486,31 @@ function convertNumber($number) {
     return (int) floor($number);
 }
 
-if(!function_exists('GeoCountry')){
-    function GeoCountry($ip = '127.0.0.1')
-    {
-        $countryCode = "OTHER";
-        $geoDatabase = storage_path('database/geoip/GeoLite2-Country.mmdb');
+if(!function_exists('ipInfo')){
+    function ipInfo($ip = '127.0.0.1'){
+        $data = ['code' => 'OTHER', 'name' => 'Other'];
+        $geoDatabase = VNCODER_CORE_PATH . 'database/geoip/GeoLite2-Country.mmdb';
         $dbReader = new Reader($geoDatabase);
-
-        $info = $dbReader->get($ip);
-        if ($info && isset($info['country']['iso_code'])) {
-            $countryCode = $info['country']['iso_code'];
-        }
-        return $countryCode;
-    }
-}
-
-if(!function_exists('GeoInfo')){
-    function GeoInfo($ip = '127.0.0.1')
-    {
-        $data = [];
-        $geoDatabase = storage_path('database/geoip/GeoLite2-Country.mmdb');
-        $dbReader = new Reader($geoDatabase);
-
         $info = $dbReader->get($ip);
         if ($info) {
             $data['code'] = $info['country']['iso_code'] ?? '';
             $data['name'] = $info['country']['names']['en'] ?? '';
         }
         return $data;
+    }
+}
+
+if(!function_exists('ipCountry')){
+    function ipCountry($ip = '127.0.0.1')
+    {
+        $countryCode = "OTHER";
+        $geoDatabase = VNCODER_CORE_PATH . 'database/geoip/GeoLite2-Country.mmdb';
+        $dbReader = new Reader($geoDatabase);
+        $info = $dbReader->get($ip);
+        if ($info && isset($info['country']['iso_code'])) {
+            $countryCode = $info['country']['iso_code'];
+        }
+        return $countryCode;
     }
 }
 
@@ -534,9 +532,54 @@ if(!function_exists('isLocalDomain')){
         if (str_ends_with($host, '.cm')) {
             return true;
         }
-
         return false;
     }
+}
 
+
+// Debugbar
+if (!function_exists('debugbar')) {
+    function debugbar()
+    {
+        return app(\VnCoder\Debugbar\LaravelDebugbar::class);
+    }
+}
+
+if (!function_exists('debug')) {
+    function debug($value)
+    {
+        $debugbar = debugbar();
+        foreach (func_get_args() as $value) {
+            $debugbar->addMessage($value, 'debug');
+        }
+    }
+}
+
+if (!function_exists('start_measure')) {
+    function start_measure($name, $label = null)
+    {
+        debugbar()->startMeasure($name, $label);
+    }
+}
+
+if (!function_exists('stop_measure')) {
+    function stop_measure($name)
+    {
+        debugbar()->stopMeasure($name);
+    }
+}
+
+if (!function_exists('add_measure')) {
+    function add_measure($label, $start, $end)
+    {
+        debugbar()->addMeasure($label, $start, $end);
+    }
+}
+
+if (!function_exists('measure')) {
+    function measure($label, \Closure $closure)
+    {
+        return debugbar()->measure($label, $closure);
+    }
 }
 

@@ -38,7 +38,7 @@ class BootstrapProvider extends ServiceProvider
 
         $this->app->singleton(
             \Illuminate\Contracts\Debug\ExceptionHandler::class,
-            \VnCoder\Core\Exceptions\HandlerExceptions::class
+            Core\Exceptions\HandlerExceptions::class
         );
 
         $runningInConsole = $this->app->runningInConsole();
@@ -54,7 +54,7 @@ class BootstrapProvider extends ServiceProvider
 
             if (cookie('__debugbar') === 'on') {
                 $this->app->make('config')->set('debugbar', require VNCODER_CORE_PATH . 'configs/debugbar.php');
-                $this->app->register(\Barryvdh\Debugbar\LumenServiceProvider::class);
+                $this->app->register(Debugbar\LumenServiceProvider::class);
             }
         }
     }

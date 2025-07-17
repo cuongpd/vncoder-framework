@@ -17,13 +17,11 @@
     },
     "autoload": {
         "psr-4": {
-            "VnCoder\\": "src/",
-            "Barryvdh\\Debugbar\\": "debugbar/"
+            "VnCoder\\": "src/"
         },
         "files": [
-            "helper/common.php",
             "helper/helper.php",
-            "helper/debugbar.php"
+            "helper/common.php"
         ]
     },
     "minimum-stability": "dev",
