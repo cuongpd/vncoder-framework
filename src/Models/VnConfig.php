@@ -10,13 +10,7 @@ class VnConfig extends VnModelBase
     protected $table = '__configs';
     protected $fillable = ['type', 'input', 'name', 'data', 'description'];
 
-    public const SETTING_KEY = ['name', 'title', 'favicon', 'description', 'keywords', 'logo', 'photo', 'email', 'phone', 'author', 'author_url', 'address', 'copyright', 'about_us', 'facebook', 'twitter', 'youtube', 'instagram', 'gdpr_status', 'gdpr_message',];
-    public const OPTIONS_KEY = [
-        // SMTP
-        'smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'smtp_secure', 'smtp_from', 'smtp_name',
-        // privacy
-        'privacy_policy',
-    ];
+    public const SETTING_KEY = ['name', 'title', 'favicon', 'description', 'keywords', 'logo', 'photo', 'email', 'phone', 'author', 'author_url', 'address', 'copyright', 'about_us', 'facebook', 'twitter', 'youtube', 'instagram', 'gdpr_status', 'gdpr_message', 'privacy_policy'];
 
     public static function getConfig($key, $default, $description)
     {
@@ -105,7 +99,6 @@ class VnConfig extends VnModelBase
         $formData['description'] = ['label' => 'Description', 'col' => 4, 'type' => 'textarea', 'rows' => 2, 'value' => $settingData['description'] ?? '', 'required' => true];
         $formData['keywords'] = ['label' => 'Keywords', 'col' => 4, 'type' => 'textarea', 'rows' => 2, 'value' => $settingData['keywords'] ?? '', 'required' => true];
         $formData['address'] = ['label' => 'Address', 'col' => 4, 'type' => 'textarea', 'rows' => 2, 'value' => $settingData['address'] ?? '', 'required' => true];
-
         $formData['about_us'] = ['label' => 'About Us', 'col' => 12, 'rows' => 10, 'type' => 'editor', 'value' => $settingData['about_us'] ?? '', 'required' => true];
 
         $formData['author'] = ['label' => 'Author', 'col' => 2, 'type' => 'text', 'value' => $settingData['author'] ?? ''];
@@ -115,8 +108,12 @@ class VnConfig extends VnModelBase
         $formData['youtube'] = ['label' => 'Youtube', 'col' => 2, 'type' => 'text', 'value' => $settingData['youtube'] ?? ''];
         $formData['instagram'] = ['label' => 'Instagram', 'col' => 2, 'type' => 'text', 'value' => $settingData['instagram'] ?? ''];
 
-        $formData['gdpr_status'] = ['label' => 'GDPR Cookie', 'col' => 2, 'type' => 'checkbox', 'value' => $settingData['gdpr_status'] ?? '', 'placeholder' => 'Bật thông báo GDPR'];
-        $formData['gdpr_message'] = ['label' => 'Nội dung thông báo GDPR', 'col' => 10, 'type' => 'textarea', 'value' => $settingData['gdpr_message'] ?? ''];
+        $formData['privacy_meta'] = ['label' => 'Privacy Policy', 'type' => 'header'];
+        $formData['privacy_policy'] = ['label' => 'Nội dung điều khoản dịch vụ Website', 'col' => 12, 'rows' => 10, 'type' => 'editor', 'value' => $settingData['privacy_policy'] ?? ''];
+
+        $formData['gdpr_meta'] = ['label' => 'GDPR Message', 'type' => 'header'];
+        $formData['gdpr_status'] = ['label' => 'GDPR Cookie', 'col' => 12, 'type' => 'checkbox', 'value' => $settingData['gdpr_status'] ?? '', 'placeholder' => 'Bật thông báo GDPR'];
+        $formData['gdpr_message'] = ['label' => 'Nội dung thông báo GDPR', 'col' => 12, 'type' => 'textarea', 'value' => $settingData['gdpr_message'] ?? ''];
 
         return $formData;
     }
@@ -142,40 +139,6 @@ class VnConfig extends VnModelBase
             }
         }
         self::updateCacheData('setting');
-        flash_message('Setting has been updated', 'success');
-    }
-
-    public static function getOptionsConfigForm(){
-        $formData = [];
-        $dataConfig = self::getQueryData('options');
-        $settingData = [];
-        foreach ($dataConfig as $item) {
-            $settingData[$item->name] = $item->data;
-        }
-
-        $formData['smtp_meta'] = ['label' => 'Cấu hình SMTP', 'type' => 'header'];
-        $formData['smtp_host'] = ['label' => 'SMTP Host', 'col' => 2, 'type' => 'text', 'value' => $settingData['smtp_host'] ?? 'smtp.gmail.com'];
-        $formData['smtp_port'] = ['label' => 'SMTP Port', 'col' => 1, 'type' => 'text', 'value' => $settingData['smtp_port'] ?? '587'];
-        $formData['smtp_secure'] = ['label' => 'SMTP Secure', 'col' => 1, 'type' => 'select', 'value' => $settingData['smtp_secure'] ?? 'ssl', 'options' => ['ssl' => 'SSL', 'tsl' => 'TSL', 'none' => 'NONE'],];
-        $formData['smtp_username'] = ['label' => 'SMTP Username', 'col' => 2, 'type' => 'text', 'value' => $settingData['smtp_username'] ?? ''];
-        $formData['smtp_password'] = ['label' => 'SMTP Password', 'col' => 2, 'type' => 'password', 'value' => $settingData['smtp_password'] ?? ''];
-        $formData['smtp_from'] = ['label' => 'SMTP From', 'col' => 2, 'type' => 'text', 'value' => $settingData['smtp_from'] ?? ''];
-        $formData['smtp_name'] = ['label' => 'SMTP Name', 'col' => 2, 'type' => 'text', 'value' => $settingData['smtp_name'] ?? ''];
-
-        $formData['privacy_meta'] = ['label' => 'Privacy Policy', 'type' => 'header'];
-        $formData['privacy_policy'] = ['label' => 'Nội dung điều khoản dịch vụ Website', 'col' => 12, 'rows' => 10, 'type' => 'editor', 'value' => $settingData['privacy_policy'] ?? ''];
-
-        return $formData;
-    }
-
-    public static function saveOptionsConfigForm(Request $request){
-        $data = $request->except('__token');
-        foreach ($data as $key => $value) {
-            if (in_array($key, self::OPTIONS_KEY)) {
-                self::updateOrCreate(['type' => 'options', 'name' => $key], ['data' => $value]);
-            }
-        }
-        self::updateCacheData('options');
         flash_message('Setting has been updated', 'success');
     }
 

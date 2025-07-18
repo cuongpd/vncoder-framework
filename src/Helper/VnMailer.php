@@ -2,13 +2,11 @@
 
 namespace VnCoder\Helper;
 use VnCoder\Helper\PHPMailer\PHPMailer;
-use VnCoder\Models\VnConfig;
 
 class VnMailer
 {
     private PHPMailer $mailer;
     protected string $fromEmail = "", $replyEmail = "", $toEmail = "";
-    private object $optionsConfig;
 
     static function init(){
         return with(new static())->start();
@@ -17,20 +15,18 @@ class VnMailer
     public function start()
     {
         $this->mailer = new PHPMailer(true);
-        $this->mailer->SMTPDebug = 0;
+        $this->mailer->SMTPDebug  = 0;
         $this->mailer->isSMTP();
-        $optionsConfig = VnConfig::getOptionsConfig();
-        $this->mailer->Host       = $optionsConfig->smtp_host ?? 'smtp.gmail.com';
+        $this->mailer->Host       = env('MAIL_HOST', 'smtp.gmail.com');
         $this->mailer->SMTPAuth   = true;
-        $this->mailer->Username   = $optionsConfig->smtp_username ?? '';
-        $this->mailer->Password   = $optionsConfig->smtp_password ?? '';
-        $this->mailer->SMTPSecure = $optionsConfig->smtp_secure ?? 'tls';
-        $this->mailer->Port       = $optionsConfig->smtp_port ?? 587;
+        $this->mailer->Username   = env('MAIL_USERNAME', '');
+        $this->mailer->Password   = env('MAIL_PASSWORD', '');
+        $this->mailer->SMTPSecure = env('MAIL_ENCRYPTION', 'tls');
+        $this->mailer->Port       = env('MAIL_PORT', 587);
         $this->mailer->isHTML(true);
         $this->mailer->XMailer = 'VnCoder Mailer 1.0';
         $this->mailer->CharSet = 'UTF-8';
         $this->mailer->Priority = 1;
-        $this->optionsConfig = $optionsConfig;
         return $this;
     }
 
@@ -93,8 +89,10 @@ class VnMailer
     public function send()
     {
         if(!$this->fromEmail){
-            if($this->optionsConfig->smtp_from && $this->optionsConfig->smtp_name) {
-                $this->mailer->setFrom($this->optionsConfig->smtp_from, $this->optionsConfig->smtp_name);
+            $smtp_from = env('MAIL_FROM_ADDRESS', '');
+            $smtp_name = env('MAIL_FROM_NAME', '');
+            if($smtp_from && $smtp_name){
+                $this->mailer->setFrom($smtp_from, $smtp_name);
             }
         }
         if($this->toEmail){

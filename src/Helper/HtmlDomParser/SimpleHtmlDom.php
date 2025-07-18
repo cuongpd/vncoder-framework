@@ -2,8 +2,6 @@
 
 namespace VnCoder\Helper\HtmlDomParser;
 
-use VnCoder\Helper\HtmlDomParser\SimpleHtmlDomNode;
-
 define('HDOM_TYPE_ELEMENT', 1);
 define('HDOM_TYPE_COMMENT', 2);
 define('HDOM_TYPE_TEXT', 3);
@@ -81,12 +79,8 @@ class SimpleHtmlDom
         'table' => 1
     );
     protected array $optional_closing_tags = array(
-        // Not optional, see
-        // https://www.w3.org/TR/html/textlevel-semantics.html#the-b-element
         'b' => array('b' => 1),
         'dd' => array('dd' => 1, 'dt' => 1),
-        // Not optional, see
-        // https://www.w3.org/TR/html/grouping-content.html#the-dl-element
         'dl' => array('dd' => 1, 'dt' => 1),
         'dt' => array('dd' => 1, 'dt' => 1),
         'li' => array('li' => 1),
@@ -100,16 +94,7 @@ class SimpleHtmlDom
         'tr' => array('td' => 1, 'th' => 1, 'tr' => 1),
     );
 
-    function __construct(
-        $str = null,
-        $lowercase = true,
-        $forceTagsClosed = true,
-        $target_charset = DEFAULT_TARGET_CHARSET,
-        $stripRN = true,
-        $defaultBRText = DEFAULT_BR_TEXT,
-        $defaultSpanText = DEFAULT_SPAN_TEXT,
-        $options = 0)
-    {
+    function __construct($str = null, $lowercase = true, $forceTagsClosed = true, $target_charset = DEFAULT_TARGET_CHARSET, $stripRN = true, $defaultBRText = DEFAULT_BR_TEXT, $defaultSpanText = DEFAULT_SPAN_TEXT, $options = 0){
         if ($str) {
             if (preg_match('/^http:\/\//i', $str) || is_file($str)) {
                 $this->load_file($str);
@@ -124,12 +109,9 @@ class SimpleHtmlDom
                 );
             }
         }
-        // Forcing tags to be closed implies that we don't trust the html, but
-        // it can lead to parsing errors if we SHOULD trust the html.
         if (!$forceTagsClosed) {
             $this->optional_closing_array = array();
         }
-
         $this->_target_charset = $target_charset;
     }
 
@@ -149,7 +131,6 @@ class SimpleHtmlDom
             $this->size = strlen($this->doc);
         }
 
-        // strip out cdata
         $this->remove_noise("'<!\[CDATA\[(.*?)]]>'is", true);
         // strip out comments
         $this->remove_noise("'<!--(.*?)-->'is");
@@ -214,9 +195,6 @@ class SimpleHtmlDom
             }
         }
 
-        // This add next line is documented in the sourceforge repository.
-        // 2977248 as a fix for ongoing memory leaks that occur even with the
-        // use of clear.
         if (isset($this->children)) {
             foreach ($this->children as $n) {
                 $n->clear();
@@ -271,8 +249,6 @@ class SimpleHtmlDom
     protected function parse()
     {
         while (true) {
-            // Read next tag if there is no text between current position and the
-            // next opening tag.
             if (($s = $this->copy_until_char('<')) === '') {
                 if($this->read_tag()) {
                     continue;
@@ -281,7 +257,6 @@ class SimpleHtmlDom
                 }
             }
 
-            // Add a text node for text between tags
             $node = new SimpleHtmlDomNode($this);
             ++$this->cursor;
             $node->_[HDOM_INFO_TEXT] = $s;
@@ -350,11 +325,8 @@ class SimpleHtmlDom
 
         if ($this->char === '/') {
             $this->char = (++$this->pos < $this->size) ? $this->doc[$this->pos] : null; // next
-            // Skip whitespace in end tags (i.e. in "</   html>")
             $this->skip($this->token_blank);
             $tag = $this->copy_until_char('>');
-
-            // Skip attributes in end tags
             if (($pos = strpos($tag, ' ')) !== false) {
                 $tag = substr($tag, 0, $pos);
             }
@@ -428,7 +400,7 @@ class SimpleHtmlDom
             return true;
         }
 
-        if ($pos = strpos($tag, '<') !== false) {
+        if ($pos = str_contains($tag, '<')) {
             $tag = '<' . substr($tag, 0, -1);
             $node->_[HDOM_INFO_TEXT] = $tag;
             $this->link_nodes($node, false);
@@ -436,16 +408,12 @@ class SimpleHtmlDom
             return true;
         }
 
-        // Handle invalid tag names (i.e. "<html#doc>")
         if (!preg_match('/^\w[\w:-]*$/', $tag)) {
             $node->_[HDOM_INFO_TEXT] = '<' . $tag . $this->copy_until('<>');
-            // Next char is the beginning of a new tag, don't touch it.
             if ($this->char === '<') {
                 $this->link_nodes($node, false);
                 return true;
             }
-
-            // Next char closes current tag, add and be done with it.
             if ($this->char === '>') { $node->_[HDOM_INFO_TEXT] .= '>'; }
             $this->link_nodes($node, false);
             $this->char = (++$this->pos < $this->size) ? $this->doc[$this->pos] : null; // next
@@ -681,7 +649,7 @@ class SimpleHtmlDom
     function search_noise($text)
     {
         foreach($this->noise as $noiseElement) {
-            if (strpos($noiseElement, $text) !== false) {
+            if (str_contains($noiseElement, $text)) {
                 return $noiseElement;
             }
         }

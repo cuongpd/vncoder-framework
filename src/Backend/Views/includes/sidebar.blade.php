@@ -29,9 +29,6 @@
                 </li>
             @endforeach
 
-{{--            @includeIf('admin::menu.sidebar')--}}
-
-
             <li class="pc-item pc-hasmenu">
                 <a href="#" class="pc-link">
                     <span class="pc-micon"><i class="fa-duotone fa-solid fa-pen-to-square"></i></span>
@@ -51,7 +48,6 @@
                 </a>
                 <ul class="pc-submenu">
                     <li class="pc-item"><a href="{{backend('core-setting.config')}}" class="pc-link"> Cài đặt chung </a></li>
-                    <li class="pc-item"><a href="{{backend('core-setting.options')}}" class="pc-link"> Tùy chỉnh hệ thống </a></li>
                     <li class="pc-item"><a href="{{backend('core-setting.website')}}" class="pc-link"> Embed Code </a></li>
                     <li class="pc-item"><a href="{{backend('core-page')}}" class="pc-link"> Trang Tĩnh </a></li>
                     <li class="pc-item"><a href="{{backend('core-setting.data')}}" class="pc-link"> Cài đặt dữ liệu </a></li>
