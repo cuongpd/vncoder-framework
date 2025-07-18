@@ -43,7 +43,6 @@ class LaravelDebugbar extends DebugBar
 {
 
     protected $app;
-
     protected string $version;
     protected bool $booted = false;
     protected bool $enabled = true;
@@ -53,7 +52,7 @@ class LaravelDebugbar extends DebugBar
     public function __construct($app = null)
     {
         if (!$app) {
-            $app = app();   //Fallback when $app is not given
+            $app = app();
         }
         $this->app = $app;
         $this->version = $app->version();

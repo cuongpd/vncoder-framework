@@ -126,8 +126,8 @@ class VnController extends Controller
     protected function initAssetsCore(){
         $this->linkCSS('core/libraries/fontawesome/css/fontawesome.min.css');
         $this->linkJS('core/libraries/jquery/jquery.min.js', true);
-        $this->linkCSS('core/libraries/vncoder/base.css');
-        $this->linkJS('core/libraries/vncoder/base.js', true);
+        $this->linkCSS('core/libraries/vncoder/core.min.css');
+        $this->linkJS('core/libraries/vncoder/core.js', true);
     }
 
     protected function initCookieBar($message){

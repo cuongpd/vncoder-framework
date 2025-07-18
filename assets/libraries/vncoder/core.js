@@ -88,32 +88,19 @@ var vncoder = {
             return t.innerHTML = n, t.textContent || t.innerText || ""
         },
         splitAndWrap: function(element, delimiter, classNamePrefix, appendChar) {
-            var contentArray = element.text().split(delimiter); // Chia theo delimiter (khoảng trắng hoặc ký tự)
+            var contentArray = element.text().split(delimiter);
             var resultHtml = "";
 
             $(contentArray).each(function(index, part) {
                 var spanContent = "";
-
-                // Nếu chia theo từ, tiếp tục chia từng từ thành ký tự
                 if (delimiter === " ") {
-                    spanContent = part
-                        .split("") // Chia thành ký tự
-                        .map(function(char, charIndex) {
-                            return '<span class="char' + (charIndex + 1) + '">' + char + "</span>";
-                        })
-                        .join("");
+                    spanContent = part.split("").map(function(char, charIndex) {
+                        return '<span class="char' + (charIndex + 1) + '">' + char + "</span>";
+                    }).join("");
                 } else {
-                    spanContent = part; // Nếu không chia thêm, chỉ giữ nguyên
+                    spanContent = part;
                 }
-
-                resultHtml +=
-                    '<span class="' +
-                    classNamePrefix +
-                    (index + 1) +
-                    '" style="display: inline-block; transform: translate3d(0px, 0px, 0px);">' +
-                    spanContent +
-                    "</span>" +
-                    appendChar;
+                resultHtml += '<span class="' + classNamePrefix + (index + 1) + '" style="display: inline-block; transform: translate3d(0px, 0px, 0px);">' + spanContent + "</span>" + appendChar;
             });
 
             element.html(resultHtml);
@@ -150,6 +137,22 @@ var vncoder = {
             vncoder.cookie.set(name, "", -1, path);
         }
     },
+    animatedText:{
+        init: function() {
+            return this.each(function() {
+                vncoder.util.splitAndWrap($(this), "", "char", "");
+            });
+        },
+        words: function() {
+            return this.each(function() {
+                vncoder.util.splitAndWrap($(this), " ", "word", " ");
+            });
+        }
+    },
+    acceptCookie: function() {
+        vncoder.cookie.set('accept_cookie', 1, 365 * 86400);
+        jQuery('.cookie-notice').remove();
+    },
     join: function(str) {
         var store = [str];
         return function extend(other) {
@@ -181,20 +184,18 @@ var vncoder = {
                 jQuery(this).remove();
             });
         }, timeout * 1000);
+    },
+    showLoading: function(message) {
+        if(!vncoder.is.string(message)) message = "\u0110ang t\u1ea3i d\u1eef li\u1ec7u...";
+        jQuery(".float-loading").remove();
+        jQuery("body").append('<div class="float-loading">' + message + "</div>");
+        jQuery(".float-loading").fadeTo("fast", 0.85);
+    },
+    hideLoading: function() {
+        jQuery(".float-loading").fadeTo("slow", 0, function() {
+            jQuery(this).remove();
+        });
     }
-};
-
-vncoder.showLoading = function(message) {
-    if(!vncoder.is.string(message)) message = "\u0110ang t\u1ea3i d\u1eef li\u1ec7u...";
-    jQuery(".float-loading").remove();
-    jQuery("body").append('<div class="float-loading">' + message + "</div>");
-    jQuery(".float-loading").fadeTo("fast", 0.85);
-};
-
-vncoder.hideLoading = function() {
-    jQuery(".float-loading").fadeTo("slow", 0, function() {
-        jQuery(this).remove();
-    });
 };
 
 vncoder.showMessage = function(message, status = 1, time = 3.5) {
@@ -246,7 +247,7 @@ vncoder.showMessage = function(message, status = 1, time = 3.5) {
 vncoder.ajax = function(toUri, ajaxData, callback, method = 'GET') {
     jQuery.ajax({
         beforeSend: vncoder.showLoading(),
-        url: BASE_URL + toUri,
+        url: (toUri.startsWith('http://') || toUri.startsWith('https://')) ? toUri : (typeof BASE_URL !== "undefined" ? BASE_URL : "") + toUri,
         type: method,
         data: ajaxData,
         dataType: "json",
@@ -269,23 +270,30 @@ vncoder.ajax = function(toUri, ajaxData, callback, method = 'GET') {
     });
 };
 
-vncoder.acceptCookie = function() {
-    vncoder.cookie.set('accept_cookie', 1, 365 * 86400);
-    jQuery('.cookie-notice').remove();
-}
+vncoder.safeText = function(str) {
+    str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/gui, "a");
+    str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/gui, "e");
+    str = str.replace(/ì|í|ị|ỉ|ĩ/gui, "i");
+    str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/gui, "o");
+    str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/gui, "u");
+    str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/gui, "y");
+    str = str.replace(/đ/g, "d");
+    str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
+    str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/gui, "E");
+    str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
+    str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/gui, "O");
+    str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/gui, "U");
+    str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/gui, "Y");
+    str = str.replace(/Đ/gui, "D");
+    str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, "");
+    str = str.replace(/\u02C6|\u0306|\u031B/g, "");
+    str = str.replace(/\(|\)/gui, "");
+    str = str.replace(/\./gui, "-");
+    str = str.replace(/ /gui, "-");
+    str = str.replace(/--/gui, "-");
+    return str.replace("--", "-").toLowerCase();
+};
 
-vncoder.animatedText = {
-    init: function() {
-        return this.each(function() {
-            vncoder.util.splitAndWrap($(this), "", "char", "");
-        });
-    },
-    words: function() {
-        return this.each(function() {
-            vncoder.util.splitAndWrap($(this), " ", "word", " ");
-        });
-    }
-}
 
 $.fn.animatedText = function(method) {
     if (vncoder.animatedText[method]) {
