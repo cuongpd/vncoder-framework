@@ -9,9 +9,9 @@ class VnController extends Controller
 {
     protected object $metaData;
     protected array $setData = [];
-    protected $isBackend = false;
+    protected bool  $isBackend = false;
     protected string $layout = 'default';
-    protected string $version = APP_VERSION;
+    protected string $version = '';
     protected string $extraHeader = '';
     protected string $extraFooter = '';
     protected string $extraHeaderCSS = '';
@@ -19,6 +19,8 @@ class VnController extends Controller
     protected string $extraFooterJS = '';
     public function __construct()
     {
+        $version = env('APP_ENV', 'production') === 'local' ? TIME_NOW : env('APP_VERSION', '1.0');
+        $this->version = 'v' . $version;
         $this->metaData = VnConfig::getWebConfig();
         $this->metaData->baseUrl = url();
         $this->metaData->version = $this->version;

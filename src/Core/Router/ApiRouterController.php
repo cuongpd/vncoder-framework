@@ -74,6 +74,7 @@ class ApiRouterController extends Controller
 
     public function Git_Update_Action(Request $request){
         $gitMessage = $this->gitUpdate();
+        $this->envUpdate();
         $dbHelper = new DatabaseHelper();
         $dbHelper->updateDatabase();
         logData('git-update', $gitMessage);
@@ -99,6 +100,16 @@ class ApiRouterController extends Controller
         $gitCommand = $gitUserUpdate ? 'sudo -u ' . $gitUserUpdate . ' git pull origin ' . $gitBranch : 'git pull origin ' . $gitBranch;
         exec($gitCommand . ' 2>&1', $output, $returnVar);
         return $output;
+    }
+
+    protected function envUpdate(){
+        $version = (int) env('APP_VERSION', 0) + 1;
+        $envFile = BASE_PATH . DIRECTORY_SEPARATOR . '.env';
+        if (file_exists($envFile)) {
+            $envContent = file_get_contents($envFile);
+            $envContent = preg_replace('/^APP_VERSION=\d+$/m', 'APP_VERSION=' . $version, $envContent);
+            file_put_contents($envFile, $envContent);
+        }
     }
 
     protected function print($content, $status = 200){

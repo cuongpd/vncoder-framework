@@ -10,15 +10,16 @@ use Illuminate\Pagination\Paginator;
 
 class BackendController extends VnController
 {
-    protected int $id = 0;
-    protected $isBackend = true;
+    protected int    $id = 0;
+    protected bool   $isBackend = true;
     protected string $__query;
     protected string $module, $controller, $action;
     protected string $linkController;
-    protected bool $usingFormEditor = false;
-    protected bool $isBackendCore = false;
-    protected string $currentBackendUrl = '', $parentBackendUrl = '';
-    protected bool $hideSidebar = false;
+    protected bool   $usingFormEditor = false;
+    protected bool   $isBackendCore = false;
+    protected string $currentBackendUrl = '';
+    protected string $parentBackendUrl = '';
+    protected bool   $hideSidebar = false;
 
     public function siteInit()
     {

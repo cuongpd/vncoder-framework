@@ -13,7 +13,6 @@ if (!defined('BASE_PATH')) {
 
 defined('LUMENT_START')             ||  define('LUMENT_START', microtime(true));
 defined('TIME_NOW')                 ||  define('TIME_NOW', time());
-defined('APP_VERSION')              ||  define('APP_VERSION', '1.0');
 defined('BASE_URL')                 ||  define('BASE_URL', env('APP_URL'));
 defined('APP_PATH')                 ||  define('APP_PATH', BASE_PATH . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR);
 defined('PUBLIC_PATH')              ||  define('PUBLIC_PATH', BASE_PATH . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR);
