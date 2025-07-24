@@ -81,6 +81,31 @@ class BootstrapProvider extends ServiceProvider
             'auth'      =>    \VnCoder\Core\Middleware\AuthMiddleware::class,
         ]);
 
+
+
+
+
+
+
+
+
+
+
+
+
+        // API Router
+        $this->app->router->group(['as' => 'api', 'prefix' => 'api/', 'middleware' => 'api'], static function ($router) {
+            $router->get('/', 'VnCoder\Core\Router\ApiRouterController@Main_Action');
+            $router->post('git-update',     'VnCoder\Core\Router\ApiRouterController@Git_Update_Action');
+            $router->get('run-console',     'VnCoder\Core\Router\ApiRouterController@Run_Console_Action');
+            $router->get('vn-helper.html',  'VnCoder\Core\Router\ApiRouterController@Open_Api_Action');
+            $router->get('open-api.json',   'VnCoder\Core\Router\ApiRouterController@Open_Api_Data_Action');
+            $router->get('{controller:[a-z][a-z0-9-]*}[/{action:[a-z0-9-]+}]',  'VnCoder\Core\Router\ApiRouterController@runApiControllerAction');
+            $router->post('{controller:[a-z][a-z0-9-]*}[/{action:[a-z0-9-]+}]', 'VnCoder\Core\Router\ApiRouterController@runApiControllerAction');
+        });
+
+
+        // Backend Router
         $this->app->router->get('backend/login.html',           [ 'as' => 'backend.login',          'uses' => 'VnCoder\Backend\Auth\AuthController@Login_Action']);
         $this->app->router->get('backend/logout.html',          [ 'as' => 'backend.logout',         'uses' => 'VnCoder\Backend\Auth\AuthController@Logout_Action']);
         $this->app->router->get('backend/reset-password.html',  [ 'as' => 'backend.reset_password', 'uses' => 'VnCoder\Backend\Auth\AuthController@Reset_Password_Action']);
@@ -96,15 +121,24 @@ class BootstrapProvider extends ServiceProvider
             $router->post('{controller:[a-z-]+}[/{action:[a-z0-9-]+}]',                 'VnCoder\Core\Router\BackendRouterController@Post_Action');
         });
 
-        // API Router
-        $this->app->router->group(['as' => 'api', 'prefix' => 'api/', 'middleware' => 'api'], static function ($router) {
-            $router->get('/', 'VnCoder\Core\Router\ApiRouterController@Main_Action');
-            $router->post('git-update',     'VnCoder\Core\Router\ApiRouterController@Git_Update_Action');
-            $router->get('run-console',     'VnCoder\Core\Router\ApiRouterController@Run_Console_Action');
-            $router->get('vn-helper.html',  'VnCoder\Core\Router\ApiRouterController@Open_Api_Action');
-            $router->get('open-api.json',   'VnCoder\Core\Router\ApiRouterController@Open_Api_Data_Action');
-            $router->get('{controller:[a-z][a-z0-9-]*}[/{action:[a-z0-9-]+}]',  'VnCoder\Core\Router\ApiRouterController@runApiControllerAction');
-            $router->post('{controller:[a-z][a-z0-9-]*}[/{action:[a-z0-9-]+}]', 'VnCoder\Core\Router\ApiRouterController@runApiControllerAction');
+        // Auth Router
+        $this->app->router->get('auth/login.html',           [ 'as' => 'auth.login',          'uses' => 'VnCoder\Core\Router\AuthController@Login_Action']);
+        $this->app->router->get('auth/register.html',        [ 'as' => 'auth.register',          'uses' => 'VnCoder\Core\Router\AuthController@Register_Action']);
+        $this->app->router->get('auth/logout.html',          [ 'as' => 'auth.logout',         'uses' => 'VnCoder\Core\Router\AuthController@Logout_Action']);
+        $this->app->router->get('auth/reset-password.html',  [ 'as' => 'auth.reset-password', 'uses' => 'VnCoder\Core\Router\AuthController@Reset_Password_Action']);
+        $this->app->router->post('auth/login.html',     'VnCoder\Core\Router\AuthController@Do_Login_Action');
+        $this->app->router->post('auth/register.html',  'VnCoder\Core\Router\AuthController@Do_Register_Action');
+
+        $this->app->router->get('auth/provider/{provider:[a-z0-9-]+}', [ 'as' => 'auth.provider', 'uses' => 'VnCoder\Core\Router\AuthController@Provider_Action']);
+        $this->app->router->get('auth/provider/{provider:[a-z0-9-]+}/callback', [ 'as' => 'auth.provider-callback', 'uses' => 'VnCoder\Core\Router\AuthController@Provider_Callback_Action']);
+
+        $this->app->router->group(['namespace' => 'App\Controllers', 'middleware' => 'website'], static function ($router) {
+            $router->get('/', [ 'as' => 'home', 'uses' => 'HomeController@Index_Action']);
+            if (file_exists(BASE_PATH . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'route.php')) {
+                require BASE_PATH . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'route.php';
+            }
+            $router->get('{controller:[a-z][a-z0-9]*}[/{action:[a-z0-9-]+}]', '\\VnCoder\\Core\\Router\\FrontendRouterController@Get_Action');
+            $router->post('{controller:[a-z][a-z0-9]*}[/{action:[a-z0-9-]+}]', '\\VnCoder\\Core\\Router\\FrontendRouterController@Post_Action');
         });
 
         // Frontend Router
@@ -117,14 +151,6 @@ class BootstrapProvider extends ServiceProvider
             return view('core::page.maintenance', $maintenanceData);
         });
 
-        $this->app->router->group(['namespace' => 'App\Controllers', 'middleware' => 'website'], static function ($router) {
-            $router->get('/', [ 'as' => 'home', 'uses' => 'HomeController@Index_Action']);
-            if (file_exists(BASE_PATH . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'route.php')) {
-                require BASE_PATH . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'route.php';
-            }
-            $router->get('{controller:[a-z][a-z0-9]*}[/{action:[a-z0-9-]+}]', '\\VnCoder\\Core\\Router\\FrontendRouterController@Get_Action');
-            $router->post('{controller:[a-z][a-z0-9]*}[/{action:[a-z0-9-]+}]', '\\VnCoder\\Core\\Router\\FrontendRouterController@Post_Action');
-        });
     }
 
 

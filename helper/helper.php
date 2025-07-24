@@ -119,6 +119,12 @@ if(!function_exists('logInfo')){
     }
 }
 
+if(!function_exists('logError')){
+    function logError($message, $context = []){
+        Log::error($message, $context);
+    }
+}
+
 if (!function_exists('minify_output')) {
     function minify_output($buffer)
     {
@@ -278,7 +284,7 @@ if (!function_exists('getNameByAction')) {
 if (!function_exists('backend')) {
     function backend($slug = '/')
     {
-        return BASE_URL . 'backend/' . str_replace('.', '/', trim(strtolower($slug), '/'));
+        return BASE_URL . 'backend/' . preg_replace('/\.(?!html$)/', '/', trim(strtolower($slug), '/'));
     }
 }
 

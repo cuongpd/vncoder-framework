@@ -32,7 +32,7 @@
                     <a href="javascript:void(0);" class="dropdown-item" onclick="updateDebugBar();"><i class="fa-duotone fa-solid fa-bug"></i>Debug : {{$__debugbar}}</a>
                     <a href="{{backend('core-console/run')}}" class="dropdown-item"><i class="fa-duotone fa-solid fa-square-terminal"></i><span>Run Command</span></a>
                     <a href="javascript:void(0);" class="dropdown-item" onclick="resetCacheData();"><i class="fa-duotone fa-solid fa-broom-wide"></i><span>Reset Cache</span></a>
-                    <a href="{{route('backend.logout')}}" class="dropdown-item"><i class="fa-duotone fa-solid fa-power-off fa-beat-fade"></i><span>Logout</span></a>
+                    <a href="{{backend('logout.html')}}" class="dropdown-item"><i class="fa-duotone fa-solid fa-power-off fa-beat-fade"></i><span>Logout</span></a>
                 </div>
             </li>
         </ul>

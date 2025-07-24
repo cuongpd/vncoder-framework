@@ -84,11 +84,36 @@ dataTableDefaults.columnDefs = [
         }
     },
     {
+        targets: 'time',
+        render: function (data, type) {
+            if (type === 'display') {
+                if(typeof data !== 'number') data = parseFloat(data);
+                if(isNaN(data) || data <= 0) return '';
+                const totalSeconds = parseInt(data, 10);
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                const pad = (num) => num.toString().padStart(2, '0');
+                return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+            }
+            return data;
+        }
+    },
+    {
         targets: 'number2',
         render: function (data, type) {
             if (type === 'display') {
-                return formatAbbreviatedNumber(data);
+                if (typeof data !== 'number') data = parseFloat(data);
+                if (isNaN(data)) return '';
+                const abbreviateNumber = (num) => {
+                    if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(2).replace(/\.00$/, '') + ' B';
+                    if (num >= 1_000_000)     return (num / 1_000_000).toFixed(2).replace(/\.00$/, '') + ' M';
+                    if (num >= 1_000)         return (num / 1_000).toFixed(2).replace(/\.00$/, '') + ' k';
+                    return num.toString();
+                };
+                return abbreviateNumber(data);
             }
+
             return data;
         }
     },
@@ -98,6 +123,24 @@ dataTableDefaults.columnDefs = [
             if (type === 'display' && data && (typeof data === 'string')) {
                 let linkUrl = (data.startsWith('http://') || data.startsWith('https://')) ? data : 'https://' + data;
                 return '<a href="' + linkUrl + '" target="_blank" class="dt-link">&#9758;Link</a>';
+            }
+            return data;
+        }
+    },
+    {
+        targets: "max-32",
+        render: function (data, type) {
+            if (type === 'display' && data && (typeof data === 'string')) {
+                return data.length > 32 ? `${data.substring(0, 32)}` : data;
+            }
+            return data;
+        }
+    },
+    {
+        targets: "max-12",
+        render: function (data, type) {
+            if (type === 'display' && data && (typeof data === 'string')) {
+                return data.length > 12 ? `${data.substring(0, 12)}` : data;
             }
             return data;
         }
@@ -116,7 +159,7 @@ dataTableDefaults.columnDefs = [
         targets: "photo",
         render: function (data, type) {
             if (type === 'display' && data && (typeof data === 'string')) {
-                return '<img src="'+data+'" class="img-thumbnail dt-photo" style="max-height: 80px;" />';
+                return `<img src="${data}" class="img-thumbnail dt-photo dt-img-hover" style="max-height: 80px; cursor: zoom-in;" />`;
             }
             return data;
         }
@@ -125,13 +168,26 @@ dataTableDefaults.columnDefs = [
         targets: "photo200",
         render: function (data, type) {
             if (type === 'display' && data && (typeof data === 'string')) {
-                return '<img src="'+data+'" class="img-thumbnail dt-photo" style="max-height: 200px;" />';
+                return `<img src="${data}" class="img-thumbnail dt-photo dt-img-hover" style="max-height: 200px; cursor: zoom-in;" />`;
             }
             return data;
         }
     },
     {
         targets: "content",
+        "createdCell": function (td, cellData, rowData, row, col) {
+            let cleanData = cellData.replace(/\n/g, ' ');
+            if (cleanData.length > 200) {
+                let truncatedData = dtTruncateString(cleanData, 200);
+                cleanData = truncatedData;
+            }
+            let wrappedText = dtWrapText(cleanData, 52);
+            $(td).html(wrappedText);
+            $(td).addClass('td-wrap-text');
+        }
+    },
+    {
+        targets: "max-content",
         "createdCell": function (td, cellData, rowData, row, col) {
             let cleanData = cellData.replace(/\n/g, ' ');
             if (cleanData.length > 200) {
@@ -181,3 +237,32 @@ if (typeof DATATABLE_EXPORT_BUTTON !== 'undefined' && DATATABLE_EXPORT_BUTTON) {
 }
 
 $.extend($.fn.dataTable.defaults, dataTableDefaults);
+
+$(document).on('draw.dt', function () {
+    if (typeof tippy === 'function') {
+        tippy('.dt-img-hover', {
+            content(reference) {
+                const image_url = reference?.src?.trim?.();
+                if (!image_url) return '';
+                const img = document.createElement('img');
+                img.src = image_url;
+                img.style.width = '250px';
+                img.style.height = '250px';
+                img.style.objectFit = 'cover';
+                img.style.borderRadius = '2px';
+                img.style.boxShadow = '0 1px 1px rgba(200,200,200,0.05)';
+                img.style.border = '1px thin #ddd';
+                return img;
+            },
+            allowHTML: true,
+            theme: 'light',
+            animation: 'shift-away',
+            placement: 'right',
+            followCursor: true,
+            interactive: false,
+            arrow: true,
+            appendTo: document.body,
+            delay: [25, 50]
+        });
+    }
+});

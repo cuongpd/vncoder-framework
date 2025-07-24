@@ -11,7 +11,7 @@
             <input class="form-check-input input-primary" type="checkbox" id="rememberMe" checked="">
             <label class="form-check-label text-muted" for="rememberMe">Remember me?</label>
         </div>
-        <h6 class="text-secondary f-w-400 mb-0"><a href="{{route('auth.reset')}}" class="text-muted">Forgot password?</a></h6>
+        <h6 class="text-secondary f-w-400 mb-0"><a href="{{route('auth.reset-password')}}" class="text-muted">Forgot password?</a></h6>
     </div>
     <div class="d-grid mt-4">
         <button type="submit" class="btn btn-primary">Login</button>

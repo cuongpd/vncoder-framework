@@ -45,7 +45,7 @@
                                 <img src="{{core_static('images/auth/facebook.svg')}}" alt="img"> <span>with Facebook</span>
                             </a>
                             <a href="{{route('auth.provider', ['provider' => 'facebook'])}}" class="btn btn-light-success bg-light d-inline-flex px-2">
-                                <img src="{{core_static('images/auth/facebook.svg')}}" alt="img"> <span>with Facebook</span>
+                                <img src="{{core_static('images/auth/twitter.svg')}}" alt="img"> <span>with Twitter</span>
                             </a>
                         </div>
                     </div>
