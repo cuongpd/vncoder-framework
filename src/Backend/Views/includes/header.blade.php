@@ -1,3 +1,6 @@
+@php
+    $topMenuStack = trim($__env->yieldPushContent('topMenu'));
+@endphp
 <div class="header-wrapper">
     <div class="me-auto pc-mob-drp">
         <ul class="list-unstyled">
@@ -7,18 +10,21 @@
             <li class="pc-h-item pc-sidebar-popup">
                 <a href="#" class="pc-head-link ms-0" id="mobile-collapse"><i class="fa-duotone fa-solid fa-bars fa-24"></i></a>
             </li>
-            <li class="pc-h-item">
-                <h4 class="meta-data-title" id="meta-data-title">{!! $__metaData->title !!}</h4>
+            <li class="pc-h-item" id="index-title">
+                <h4 class="meta-data-title @if (!empty($topMenuStack)) d-none d-sm-block @endif" id="meta-data-title">{!! $__metaData->title !!}</h4>
             </li>
         </ul>
     </div>
     <div class="ms-auto">
         <ul class="list-unstyled">
-            <li class="pc-h-item">
-                <div class="menu-item d-none d-sm-block">
-                    @stack('topMenu')
-                </div>
-            </li>
+            @if (!empty($topMenuStack))
+                <li class="pc-h-item">
+                    <div class="menu-item">
+                        {!! $topMenuStack !!}
+                    </div>
+                </li>
+            @endif
+
             <li class="dropdown pc-h-item header-user-profile">
                 <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
                     <img src="{{$__userData['avatar']}}" alt="user-image" class="user-avtar px-1">

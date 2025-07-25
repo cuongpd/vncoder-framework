@@ -150,7 +150,11 @@ dataTableDefaults.columnDefs = [
         render: function (data, type) {
             if (type === 'display' && data && (typeof data === 'string')) {
                 let linkUrl = (data.startsWith('http://') || data.startsWith('https://')) ? data : 'https://' + data;
-                return '<a href="' + linkUrl + '" target="_blank" class="dt-link-data">' + linkUrl.replace(/^https?:\/\//, '') + '</a>';
+                let linkName = linkUrl.replace(/^https?:\/\//, '');
+                 if (linkName.length > 50) {
+                    linkName = linkName.slice(0, 50) + '...';
+                 }
+                return '<a href="' + linkUrl + '" target="_blank" class="dt-link-data">' + linkName + '</a>';
             }
             return data;
         }
@@ -175,28 +179,30 @@ dataTableDefaults.columnDefs = [
     },
     {
         targets: "content",
-        "createdCell": function (td, cellData, rowData, row, col) {
-            let cleanData = cellData.replace(/\n/g, ' ');
-            if (cleanData.length > 200) {
-                let truncatedData = dtTruncateString(cleanData, 200);
-                cleanData = truncatedData;
+        render: function (data, type) {
+            if (type === 'display' && data && (typeof data === 'string')) {
+                if (data.length >225) {
+                    let wrappedText = dtWrapText(data.replace(/\n/g, ' '),72);
+                    return `<span class="dt-content-text"><small>${wrappedText}</small></span>`;
+                }else{
+                    let wrappedText = dtWrapText(data.replace(/\n/g, ' '),55);
+                    return `<span class="dt-content-text">${wrappedText}</span>`;
+                }
             }
-            let wrappedText = dtWrapText(cleanData, 52);
-            $(td).html(wrappedText);
-            $(td).addClass('td-wrap-text');
+            return data;
         }
     },
     {
-        targets: "max-content",
-        "createdCell": function (td, cellData, rowData, row, col) {
-            let cleanData = cellData.replace(/\n/g, ' ');
-            if (cleanData.length > 200) {
-                let truncatedData = dtTruncateString(cleanData, 200);
-                cleanData = truncatedData;
+        targets: "truncated",
+        render: function (data, type) {
+            if (type === 'display' && data && (typeof data === 'string')) {
+                if (data.length > 50) {
+                    let truncatedData = dtTruncateString(data.replace(/\n/g, ' '), 200);
+                    let wrappedText = dtWrapText(truncatedData,50);
+                    return `<span class="dt-content-text">${wrappedText}</span>`;
+                }
             }
-            let wrappedText = dtWrapText(cleanData, 52);
-            $(td).html(wrappedText);
-            $(td).addClass('td-wrap-text');
+            return data;
         }
     },
     {
