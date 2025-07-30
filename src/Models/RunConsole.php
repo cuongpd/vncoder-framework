@@ -2,72 +2,66 @@
 
 namespace VnCoder\Models;
 
+define('CONSOLE_PATH_FILE', STORAGE_PATH . 'logs/console.json');
+
 class RunConsole
 {
-    const COMMAND_CACHE_KEY = 'command_cache_key';
-    const COMMAND_CACHE_RUNTIME = 'command_cache_runtime';
 
     public static function sendCommand($controller, $action = 'index')
     {
-        cache(self::COMMAND_CACHE_KEY, $controller . ' ' . $action, 360);
-        cache(self::COMMAND_CACHE_RUNTIME, $controller . '__' . $action, 360);
+        $data = [
+            'controller' => $controller,
+            'action' => $action,
+            'time' => time(),
+            'active' => false
+        ];
+        put_contents(CONSOLE_PATH_FILE, json_encode($data));
         self::setMessage($controller . '__' . $action, '');
     }
 
     public static function removeCommand(){
-        cache(self::COMMAND_CACHE_KEY, '');
+        if(is_file(CONSOLE_PATH_FILE)){
+            @unlink(CONSOLE_PATH_FILE);
+        }
+
     }
 
     public static function getCommand()
     {
-        return cache(self::COMMAND_CACHE_KEY);
+        return json_content(CONSOLE_PATH_FILE);
+    }
+
+    public static function setCommandActive(){
+        $data = self::getCommand();
+        if ($data) {
+            $data['active'] = true;
+            put_contents(CONSOLE_PATH_FILE, json_encode($data));
+        }
     }
 
     public static function isConsoleRunning()
     {
-        $cache = cache(self::COMMAND_CACHE_KEY);
-        return $cache != '';
+        $data = json_content(CONSOLE_PATH_FILE);
+        return !empty($data) && isset($data['controller']) && isset($data['action']);
     }
 
     public static function getMessage()
     {
-        $message = '';
-//        if(self::isConsoleRunning()){
-//            return $message;
-//        }
-        $command = cache(self::COMMAND_CACHE_RUNTIME);
-        if($command){
-            $message = get_contents(storage_path('logs/console-'.md5($command).'.log'));
-            if($message){
-                cache(self::COMMAND_CACHE_RUNTIME, '');
-            }
+        $command = self::getCommand();
+        $commandLog = storage_path('logs/console-'.$command['controller'].'__'.$command['action'].'.log');
+        $message = get_contents($commandLog);
+        if($message){
+            self::removeCommand();
+            unlink($commandLog);
         }
         return $message;
     }
 
     public static function setMessage($command, $message)
     {
-        $filePath = storage_path('logs/console-'.md5($command).'.log');
-        file_put_contents($filePath, $message);
+        $filePath = storage_path('logs/console-'.$command.'.log');
+        put_contents($filePath, $message);
     }
 
-    public static function checkRunning($command)
-    {
-        $lockKey = 'console_lock_' . md5($command);
-        return cache($lockKey, false);
-    }
-
-    public static function setRunning($command)
-    {
-        $lockKey = 'console_lock_' . md5($command);
-        cache($lockKey, 'run', 3600); // Lock for 1 hour
-    }
-
-    public static function clearRunning($command)
-    {
-        $lockKey = 'console_lock_' . md5($command);
-        cache($lockKey, '', -1);
-        self::removeCommand();
-    }
 
 }

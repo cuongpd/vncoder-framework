@@ -47,7 +47,7 @@
             });
         }
         fetchData();
-        intervalId = setInterval(fetchData, 1000);
+        intervalId = setInterval(fetchData, 10000);
     });
 </script>
 @endpush

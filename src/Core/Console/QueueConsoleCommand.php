@@ -12,25 +12,25 @@ class QueueConsoleCommand extends Command
     public function handle()
     {
         $consoleCommand = RunConsole::getCommand();
-        if ($consoleCommand) {
-            logData('console', "Call command 'php artisan run {$consoleCommand}'");
-            if(RunConsole::checkRunning($consoleCommand)){
-                logData('console', "Command 'php artisan run {$consoleCommand}' is already running. Skipped.");
-                return;
-            }else{
-                RunConsole::setRunning($consoleCommand);
-                try {
-                    $artisanCommand = 'run ' . $consoleCommand;
-                    Artisan::call($artisanCommand);
-                    RunConsole::clearRunning($consoleCommand);
-                } catch (\Exception $e) {
-                    logData('console', "Error running command '{$consoleCommand}': " . $e->getMessage());
-                    RunConsole::clearRunning($consoleCommand);
-                } finally {
-                    RunConsole::clearRunning($consoleCommand);
-                }
+        $controller = $consoleCommand['controller'] ?? '';
+        $action = $consoleCommand['action'] ?? '';
+        $active = $consoleCommand && isset($consoleCommand['active']) ? $consoleCommand['active'] : false;
+        $artisanCommand = 'run ' . $controller . ($action ? ' ' . $action : '');
+        logData('console', "Call command 'php artisan run {$artisanCommand}'");
+        if($controller && !$active){
+            RunConsole::setCommandActive();
+            try {
+                Artisan::call($artisanCommand);
+                logData('console', "Command 'php artisan run {$artisanCommand}' executed successfully.");
+                RunConsole::removeCommand();
+            } catch (\Exception $e) {
+                logData('console', "Error running command '{$consoleCommand}': " . $e->getMessage());
+                RunConsole::removeCommand();
+            } finally {
+                RunConsole::removeCommand();
             }
-
+        }else{
+            logData('console', "Command 'php artisan run {$artisanCommand}' is already running. Skipped.");
         }
 
     }

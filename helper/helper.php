@@ -558,7 +558,7 @@ if(!function_exists('isLocalDomain')){
 if(!function_exists('json_content')){
     function json_content($filename, $associative = true)
     {
-        if(file_exists($filename)){
+        if(is_file($filename)){ // chỉ đọc nếu thực sự là file
             return json_decode(file_get_contents($filename), $associative);
         }
         return [];
@@ -574,21 +574,26 @@ if (!function_exists('get_contents')) {
     }
 }
 
-if (!function_exists('put_contents')) {
-    function put_contents($path, $data, $flags = 0){
-        $directory = dirname($path);
-        if (!is_dir($directory)) {
-            if (!mkdir($directory, 0777, true)) {
-                throw new \RuntimeException("Failed to create directory: $directory");
-            }
+if(!function_exists('put_contents')){
+    function put_contents($file, $data){
+        $dir = dirname($file);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
         }
-        $bytesWritten = file_put_contents($path, $data, $flags);
-        if ($bytesWritten === false) {
-            throw new \RuntimeException("Failed to write to file: $path");
+        $fp = fopen($file, 'c+');
+        if ($fp === false) return false;
+        if (flock($fp, LOCK_EX)) {
+            ftruncate($fp, 0);
+            rewind($fp);
+            fwrite($fp, $data);
+            fflush($fp);
+            flock($fp, LOCK_UN);
         }
-        return $bytesWritten;
+        fclose($fp);
+        return true;
     }
 }
+
 
 if(!function_exists('encryptData')){
     function encryptData($data){

@@ -14,7 +14,8 @@ class ConsoleController extends BackendController
         $this->metaData->title = 'Run Console';
         $this->setData['isConsoleRunning'] = RunConsole::isConsoleRunning();
         $this->setData['listCommand'] =  $this->getListCommand();
-        $this->setData['currentCommand'] = RunConsole::getCommand();
+        $currentCommand = RunConsole::getCommand();
+        $this->setData['currentCommand'] = 'php artisan run ' . ($currentCommand['controller'] ?? '') . ' ' . ($currentCommand['action'] ?? '');
         return $this->views('admin.console');
     }
 
