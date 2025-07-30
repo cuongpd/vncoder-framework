@@ -274,4 +274,5 @@ class VnConfig extends VnModelBase
         return 'text';
     }
 
+
 }

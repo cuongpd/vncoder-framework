@@ -3,7 +3,6 @@
 namespace VnCoder\Core\Router;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
 use OpenApi\Generator;
 use VnCoder\Helper\DatabaseHelper;
 use Laravel\Lumen\Routing\Controller;
@@ -47,29 +46,6 @@ class ApiRouterController extends Controller
         $openapi = Generator::scan([API_PATH]);
         header('Content-Type: application/json; charset=utf-8');
         return $openapi->toJson();
-    }
-
-    public function Run_Console_Action(Request $request){
-        $controller = $request->input('controller');
-        $action = $request->input('action', 'index');
-        if (empty($controller)) {
-            return $this->print("Không nhận diện được Controller");
-        }
-        $controllerName = str_replace(' ', '', ucwords(str_replace('-', ' ', $controller))) . 'Command';
-        $command_file = COMMAND_PATH . $controllerName . '.php';
-        if (!file_exists($command_file)) {
-            return $this->print("Không tìm thấy controller: <code>$controllerName</code>");
-        }
-        $artisanCommand = "run {$controller} {$action}";
-        $output = "";
-        try {
-            echo "Running command: $artisanCommand\n";
-            Artisan::call($artisanCommand);
-            $output .= Artisan::output();
-        } catch (\Exception $e) {
-            return $this->print("Lỗi khi thực thi: " . $e->getMessage());
-        }
-        return $this->print($output . "\n");
     }
 
     public function Git_Update_Action(Request $request){

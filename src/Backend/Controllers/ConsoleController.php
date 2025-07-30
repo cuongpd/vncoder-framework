@@ -1,9 +1,8 @@
 <?php
 
 namespace VnCoder\Backend\Controllers;
-
-use Illuminate\Support\Facades\Artisan;
-use Symfony\Component\Console\Output\BufferedOutput;
+use Illuminate\Http\Request;
+use VnCoder\Models\RunConsole;
 
 class ConsoleController extends BackendController
 {
@@ -13,8 +12,29 @@ class ConsoleController extends BackendController
     }
     public function Run_Action(){
         $this->metaData->title = 'Run Console';
-        $this->setData['listCommand'] = $this->getListCommand();
+        $this->setData['isConsoleRunning'] = RunConsole::isConsoleRunning();
+        $this->setData['listCommand'] =  $this->getListCommand();
+        $this->setData['currentCommand'] = RunConsole::getCommand();
         return $this->views('admin.console');
+    }
+
+    public function Run_Action_Submit(Request $request){
+        $command = trim($request->input('command', ''));
+        if($command && !RunConsole::isConsoleRunning()){
+            @list($controller, $action) = explode(' ', $command, 2);
+            if($controller) RunConsole::sendCommand($controller, $action);
+        }
+        return redirect(backend('core-console/run'));
+    }
+
+    public function Run_Data_Action(){
+        $isConsoleRunning = RunConsole::isConsoleRunning();
+        if(!$isConsoleRunning){
+            RunConsole::removeCommand();
+            return $this->toJsonData('');
+        }
+        $message = RunConsole::getMessage();
+        return $message ? $this->toJsonData($message) : $this->toJsonError('Đang chạy lệnh, vui lòng đợi trong giây lát!');
     }
 
     protected function getListCommand(){

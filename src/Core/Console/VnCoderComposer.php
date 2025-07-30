@@ -25,14 +25,6 @@ class VnCoderComposer extends Command
             symlink($uploadFolder, $uploadFolderSymlink);
         }
 
-        // App folder
-        // $uploadFolder = storage_path('app');
-        // $uploadFolderSymlink = PUBLIC_PATH . 'app';
-        // if (!is_dir($uploadFolderSymlink)) {
-        //     echo "Symlink folder " . $uploadFolder . " to ". $uploadFolderSymlink . "\n";
-        //     symlink($uploadFolder, $uploadFolderSymlink);
-        // }
-
         // static core asset folder
         $assetsFolder = VNCODER_CORE_PATH . 'assets';
         $assetsFolderSymlink = PUBLIC_PATH . 'core';

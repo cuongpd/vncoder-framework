@@ -93,12 +93,16 @@ if (!function_exists('cookie')) {
 }
 
 if (!function_exists('cache')) {
-    function cache($key, $data = null, $time_seconds = 3600)
+    function cache($key, $value = '[__cache_no_value__]', $minutes = 60)
     {
-        if ($data) {
-            return app('cache')->put($key, $data, $time_seconds);
+        $cache = app('cache');
+        if ($value === '[__cache_no_value__]') {
+            return $cache->get($key);
         }
-        return app('cache')->get($key);
+        if ($value === null || $value === '') {
+            return $cache->forget($key);
+        }
+        return $cache->put($key, $value, $minutes);
     }
 }
 
@@ -108,7 +112,16 @@ if(!function_exists('logData')){
             $data = json_encode($data);
         }
         $message = date('Y-m-d H:i:s', TIME_NOW) . PHP_EOL . $data . PHP_EOL;
-        file_put_contents(storage_path('app/logs/' . $name . '.txt'), $message, FILE_APPEND);
+        file_put_contents(storage_path('logs/vncoder-' . $name . '.txt'), $message, FILE_APPEND);
+    }
+}
+
+if(!function_exists('logMessage')){
+    function logMessage($name, $data){
+        if(is_array($data) || is_object($data)){
+            $data = json_encode($data);
+        }
+        file_put_contents(storage_path('logs/message-' . $name . '.txt'),  $data);
     }
 }
 
@@ -542,6 +555,15 @@ if(!function_exists('isLocalDomain')){
     }
 }
 
+if(!function_exists('json_content')){
+    function json_content($filename, $associative = true)
+    {
+        if(file_exists($filename)){
+            return json_decode(file_get_contents($filename), $associative);
+        }
+        return [];
+    }
+}
 
 if (!function_exists('get_contents')) {
     function get_contents($filename) {
@@ -565,6 +587,21 @@ if (!function_exists('put_contents')) {
             throw new \RuntimeException("Failed to write to file: $path");
         }
         return $bytesWritten;
+    }
+}
+
+if(!function_exists('encryptData')){
+    function encryptData($data){
+        return base64_encode(serialize($data));
+    }
+}
+
+if(!function_exists('decryptData')){
+    function decryptData($data){
+        if (empty($data)) {
+            return [];
+        }
+        return unserialize(base64_decode($data));
     }
 }
 

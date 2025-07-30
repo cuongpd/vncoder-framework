@@ -3,12 +3,14 @@
 namespace VnCoder\Core\Console;
 
 use Illuminate\Console\Command;
+use JetBrains\PhpStorm\NoReturn;
 
 class VnCoderCommand extends Command
 {
     protected $signature = 'run {controller} {action?}';
     protected $description = "Lumen Command : php artisan run {run-command} {action?}";
 
+    #[NoReturn]
     public function handle()
     {
         if(php_sapi_name() === 'cli' || defined('STDIN')){
@@ -24,12 +26,15 @@ class VnCoderCommand extends Command
             exit();
         }
         $action = $this->argument('action');
+        $command = $controller . ($action ? '__' . $action : '');
+
         if (preg_match('/^\d/', $controller)) {
             $controller = 'N'. $controller;
         }
         if (preg_match('/^\d/', $action)) {
             $action = 'N'. $action;
         }
+
         $controller = str_replace('-', ' ', $controller);
         $controllerName = str_replace(' ', '', ucwords(str_replace('-', ' ', $controller))) . 'Command';
 
@@ -52,7 +57,11 @@ class VnCoderCommand extends Command
                 $this->error("Method $actionName not active in class $commandController");
                 exit();
             }
-            return $commandClass->$actionName();
+            $commandClass->command = $command;
+            $commandClass->clearLogs();
+            $commandClass->$actionName();
+            $commandClass->saveLogs();
+            exit();
         }
         // Create Command
         $command_file = COMMAND_PATH. $controllerName. '.php';

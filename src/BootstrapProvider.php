@@ -15,6 +15,7 @@ defined('LUMENT_START')             ||  define('LUMENT_START', microtime(true));
 defined('TIME_NOW')                 ||  define('TIME_NOW', time());
 defined('BASE_URL')                 ||  define('BASE_URL', env('APP_URL'));
 defined('APP_PATH')                 ||  define('APP_PATH', BASE_PATH . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR);
+defined('STORAGE_PATH')             ||  define('STORAGE_PATH', BASE_PATH . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR);
 defined('PUBLIC_PATH')              ||  define('PUBLIC_PATH', BASE_PATH . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR);
 defined('ADMIN_PATH')               ||  define('ADMIN_PATH', APP_PATH . 'Admin' . DIRECTORY_SEPARATOR);
 defined('COMMAND_PATH')             ||  define('COMMAND_PATH', ADMIN_PATH . 'Command' . DIRECTORY_SEPARATOR);
@@ -28,23 +29,17 @@ class BootstrapProvider extends ServiceProvider
 {
     public function register()
     {
-        $config = $this->app->make('config');
-        $config->set('services', require VNCODER_CORE_PATH . 'configs/services.php');
-        $config->set('session', require VNCODER_CORE_PATH . 'configs/session.php');
+        $this->app->make('config')->set('services', require VNCODER_CORE_PATH . 'configs' . DIRECTORY_SEPARATOR . 'services.php');
+        $this->app->make('config')->set('session', require VNCODER_CORE_PATH . 'configs'. DIRECTORY_SEPARATOR .'session.php');
 
         $this->app->singleton(
             \Illuminate\Contracts\Debug\ExceptionHandler::class,
             Core\Exceptions\HandlerExceptions::class
         );
 
-        $runningInConsole = $this->app->runningInConsole();
-        $isRunConsoleRoute = !$runningInConsole && $this->isRunConsoleRoute();
-
-        if ($runningInConsole || $isRunConsoleRoute) {
+        if ($this->app->runningInConsole()) {
             $this->registerConsoleCommands();
-        }
-
-        if (!$runningInConsole) {
+        }else{
             $this->registerSessionServices();
             $this->registerRouter();
 
@@ -82,22 +77,10 @@ class BootstrapProvider extends ServiceProvider
         ]);
 
 
-
-
-
-
-
-
-
-
-
-
-
         // API Router
         $this->app->router->group(['as' => 'api', 'prefix' => 'api/', 'middleware' => 'api'], static function ($router) {
             $router->get('/', 'VnCoder\Core\Router\ApiRouterController@Main_Action');
             $router->post('git-update',     'VnCoder\Core\Router\ApiRouterController@Git_Update_Action');
-            $router->get('run-console',     'VnCoder\Core\Router\ApiRouterController@Run_Console_Action');
             $router->get('vn-helper.html',  'VnCoder\Core\Router\ApiRouterController@Open_Api_Action');
             $router->get('open-api.json',   'VnCoder\Core\Router\ApiRouterController@Open_Api_Data_Action');
             $router->get('{controller:[a-z][a-z0-9-]*}[/{action:[a-z0-9-]+}]',  'VnCoder\Core\Router\ApiRouterController@runApiControllerAction');
@@ -128,6 +111,7 @@ class BootstrapProvider extends ServiceProvider
         $this->app->router->get('auth/reset-password.html',  [ 'as' => 'auth.reset-password', 'uses' => 'VnCoder\Core\Router\AuthController@Reset_Password_Action']);
         $this->app->router->post('auth/login.html',     'VnCoder\Core\Router\AuthController@Do_Login_Action');
         $this->app->router->post('auth/register.html',  'VnCoder\Core\Router\AuthController@Do_Register_Action');
+        $this->app->router->get('auth/modal/{action:[a-z-]+}', 'VnCoder\Core\Router\AuthController@Modal_Action');
 
         $this->app->router->get('auth/provider/{provider:[a-z0-9-]+}', [ 'as' => 'auth.provider', 'uses' => 'VnCoder\Core\Router\AuthController@Provider_Action']);
         $this->app->router->get('auth/provider/{provider:[a-z0-9-]+}/callback', [ 'as' => 'auth.provider-callback', 'uses' => 'VnCoder\Core\Router\AuthController@Provider_Callback_Action']);
@@ -153,26 +137,17 @@ class BootstrapProvider extends ServiceProvider
 
     }
 
-
-    protected function isRunConsoleRoute(): bool
-    {
-        if (!isset($_SERVER['REQUEST_URI'])) {
-            return false;
-        }
-        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        return $uri === '/api/run-console';
-    }
-
     protected function registerConsoleCommands(): void
     {
         $this->commands([
             Core\Console\QueueCheckup::class,
+            Core\Console\QueueConsoleCommand::class,
+            Core\Console\RunGitCommand::class,
             Core\Console\VnCoderCommand::class,
             Core\Console\VnCoderComposer::class,
-            Core\Console\GitCommand::class,
         ]);
 
-        $this->app->singleton(\Illuminate\Contracts\Console\Kernel::class, Core\Console\QueueSchedule::class);
+        $this->app->singleton(\Illuminate\Contracts\Console\Kernel::class, Core\Console\VnCoderSchedule::class);
     }
 
     protected function registerSessionServices(): void

@@ -24,10 +24,10 @@ class VnController extends Controller
         $this->metaData = VnConfig::getWebConfig();
         $this->metaData->baseUrl = url();
         $this->metaData->version = $this->version;
+        $this->initAssetsCore();
         if (method_exists($this, 'siteInit')) {
             $this->siteInit();
         }
-        $this->initAssetsCore();
     }
 
     public function views($bladeName, $isBackendCore = false)
@@ -134,11 +134,15 @@ class VnController extends Controller
 
     protected function initCookieBar($message){
         $this->linkJS('core/libraries/cookie/cookieBar.min.js');
-        $this->footer('<div id="cookieBar"></div><script>if (typeof cookieBar === "function") {new cookieBar('.json_encode(['message' => $message]).');}</script>');
+        $this->footer('<div id="cookieBar"></div><script>if (typeof cookieBar === "function") {new cookieBar('.json_encode(['button' => 'Đồng ý', 'message' => $message]).');}</script>');
     }
 
     protected function toJsonData($data){
         return response()->json(['status' => 1, 'message' => '', 'data' => $data]);
+    }
+
+    protected function toJsonSuccess($message = ''){
+        return response()->json(['status' => 1, 'message' => $message]);
     }
 
     protected function toJsonError($message = ''){

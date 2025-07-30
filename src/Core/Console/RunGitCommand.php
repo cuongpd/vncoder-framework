@@ -4,7 +4,7 @@ namespace VnCoder\Core\Console;
 use Illuminate\Console\Command;
 use VnCoder\Helper\DatabaseHelper;
 
-class GitCommand extends Command
+class RunGitCommand extends Command
 {
     protected $signature = 'git:commit {message?*}';
     protected $description = "Git Command : php artisan git {commit|update} {message?*}";

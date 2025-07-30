@@ -2,9 +2,10 @@
 
 namespace VnCoder\Backend\Controllers;
 
-use VnCoder\Models\VnUser;
+use VnCoder\Backend\Models\Admin;
 use Laravel\Lumen\Routing\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class AjaxController extends Controller
 {
@@ -22,9 +23,10 @@ class AjaxController extends Controller
     }
 
     public function Reset_Cache_Action_Submit(){
-        app('cache')->flush();
-        flash_message('Cache đã được xóa!', 'success');
-        return response()->json(['status' => 1]);
+        $status = Cache::flush() ? 1 : -1;
+        $message = $status == 1 ? 'Cache đã được xóa!' : 'Không thể xóa cache!';
+        flash_message($message, $status == 1 ? 'success' : 'error');
+        return response()->json(['status' => $status]);
     }
 
     public function Dark_Mode_Action_Submit(Request $request){
@@ -33,7 +35,7 @@ class AjaxController extends Controller
      }
 
     public function Ping_Action_Submit(){
-        VnUser::setUserCookie(session('admin_uid'));
+        Admin::setUserCookie(session('admin_uid'));
         return response()->json(['status' => 1]);
     }
 

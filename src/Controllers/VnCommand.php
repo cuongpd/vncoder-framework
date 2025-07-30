@@ -2,10 +2,14 @@
 
 namespace VnCoder\Controllers;
 
+use VnCoder\Models\RunConsole;
+
 class VnCommand
 {
     protected bool $runInConsole = true;
     protected array $tableKey = [];
+    public string $command = "";
+    protected string $output = "";
 
     public function __construct()
     {
@@ -13,6 +17,16 @@ class VnCommand
             ob_end_flush();
         }
         ob_implicit_flush(true);
+    }
+
+    public function clearLogs(){
+        RunConsole::setMessage($this->command, "");
+    }
+
+    public function saveLogs(){
+        $output = $this->output;
+        if(!$output) $output = 'No output';
+        RunConsole::setMessage($this->command, $output);
     }
 
     protected function info(...$message)
@@ -26,7 +40,8 @@ class VnCommand
     {
         if (is_array($data) || is_object($data)) {
             var_dump($data);
-            echo "\n";
+            $this->output .= print_r($data, true);
+            $this->endLine();
         } else {
             $this->echo($data);
         }
@@ -56,12 +71,12 @@ class VnCommand
     protected function echo($info)
     {
         echo $info. "\n";
+        $this->output .= $info . "\n";
     }
 
     protected function endLine()
     {
         echo "\n";
-        usleep(50000);
     }
 
     protected function sleep($time = 5){
