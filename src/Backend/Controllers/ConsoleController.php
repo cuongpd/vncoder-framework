@@ -12,16 +12,17 @@ class ConsoleController extends BackendController
     }
     public function Run_Action(){
         $this->metaData->title = 'Run Console';
-        $this->setData['isConsoleRunning'] = RunConsole::isConsoleRunning();
         $this->setData['listCommand'] =  $this->getListCommand();
-        $currentCommand = RunConsole::getCommand();
+        $currentCommand = RunConsole::getCommandData();
+        $this->setData['isConsoleRunning'] = $currentCommand ?? false;
         $this->setData['currentCommand'] = 'php artisan run ' . ($currentCommand['controller'] ?? '') . ' ' . ($currentCommand['action'] ?? '');
         return $this->views('admin.console');
     }
 
     public function Run_Action_Submit(Request $request){
         $command = trim($request->input('command', ''));
-        if($command && !RunConsole::isConsoleRunning()){
+        $currentCommand = RunConsole::getCommandData();
+        if($command && !$currentCommand){
             @list($controller, $action) = explode(' ', $command, 2);
             if($controller) RunConsole::sendCommand($controller, $action);
         }
@@ -29,13 +30,22 @@ class ConsoleController extends BackendController
     }
 
     public function Run_Data_Action(){
-        $isConsoleRunning = RunConsole::isConsoleRunning();
-        if(!$isConsoleRunning){
+        $currentCommand = RunConsole::getCommandData();
+        if(!$currentCommand){
             RunConsole::removeCommand();
             return $this->toJsonData('');
         }
-        $message = RunConsole::getMessage();
-        return $message ? $this->toJsonData($message) : $this->toJsonError('Đang chạy lệnh, vui lòng đợi trong giây lát!');
+        $active = $currentCommand['active'] ?? false;
+        if($active){
+            $message = RunConsole::getMessage();
+            if($message){
+                if($message == '[__NA__]') $message = 'Đã xử lý xong lệnh!';
+                return $this->toJsonData($message);
+            }
+            return $this->toJsonError('Đang chạy lệnh, vui lòng đợi trong giây lát!...');
+        }else{
+            return $this->toJsonError('Lệnh đang trong hàng đợi, vui lòng đợi trong giây lát!...');
+        }
     }
 
     protected function getListCommand(){

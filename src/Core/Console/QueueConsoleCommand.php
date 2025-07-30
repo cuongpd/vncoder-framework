@@ -11,7 +11,7 @@ class QueueConsoleCommand extends Command
 
     public function handle()
     {
-        $consoleCommand = RunConsole::getCommand();
+        $consoleCommand = RunConsole::getCommandData();
         $controller = $consoleCommand['controller'] ?? '';
         $action = $consoleCommand['action'] ?? '';
         $active = $consoleCommand && isset($consoleCommand['active']) ? $consoleCommand['active'] : false;

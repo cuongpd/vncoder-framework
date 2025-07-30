@@ -9,59 +9,91 @@ class RunConsole
 
     public static function sendCommand($controller, $action = 'index')
     {
-        $data = [
-            'controller' => $controller,
-            'action' => $action,
-            'time' => time(),
-            'active' => false
-        ];
-        put_contents(CONSOLE_PATH_FILE, json_encode($data));
-        self::setMessage($controller . '__' . $action, '');
+        self::setCommandData($controller, $action, false );
+        self::deleteLogCommand($controller . '__' . $action);
     }
 
     public static function removeCommand(){
-        if(is_file(CONSOLE_PATH_FILE)){
-            @unlink(CONSOLE_PATH_FILE);
-        }
-
+        return VnConfig::where('type', 'console')->where('name', 'console')->delete();
     }
 
-    public static function getCommand()
+    public static function getCommandData()
     {
-        return json_content(CONSOLE_PATH_FILE);
+        $data = VnConfig::where('type', 'console')->where('name', 'console')->first();
+        if($data){
+            return json_decode($data->data, true);
+        }
+        return [];
     }
 
     public static function setCommandActive(){
-        $data = self::getCommand();
-        if ($data) {
-            $data['active'] = true;
-            put_contents(CONSOLE_PATH_FILE, json_encode($data));
+        $data = self::getCommandData();
+        if($data && isset($data['controller']) && isset($data['action'])) {
+            self::setCommandData($data['controller'], $data['action'], true );
         }
-    }
-
-    public static function isConsoleRunning()
-    {
-        $data = json_content(CONSOLE_PATH_FILE);
-        return !empty($data) && isset($data['controller']) && isset($data['action']);
     }
 
     public static function getMessage()
     {
-        $command = self::getCommand();
-        $commandLog = storage_path('logs/console-'.$command['controller'].'__'.$command['action'].'.log');
-        $message = get_contents($commandLog);
+        $command = self::getCommandData();
+        $commandKey = $command['controller'] . '__' . $command['action'];
+        $message = self::getLogCommand($commandKey);
         if($message){
             self::removeCommand();
-            unlink($commandLog);
+            self::deleteLogCommand($commandKey);
         }
         return $message;
     }
 
-    public static function setMessage($command, $message)
-    {
-        $filePath = storage_path('logs/console-'.$command.'.log');
-        put_contents($filePath, $message);
+    public static function setData($data){
+        return VnConfig::updateOrCreate(['type' => 'console', 'name' => 'console'], ['type' => 'console', 'name' => 'console', 'data' => json_encode($data)]);
     }
+
+    public static function getData(){
+        $data = VnConfig::where('type', 'console')->where('name', 'console')->first();
+        if($data){
+            return json_decode($data->data, true);
+        }
+        return [];
+    }
+
+    public static function removeData(){
+        return VnConfig::where('type', 'console')->where('name', 'console')->delete();
+    }
+
+    public static function logCommand($command, $message){
+        $key = 'console-data-'. $command;
+        VnConfig::updateOrCreate(['type' => 'console', 'name' => $key], ['type' => 'console', 'name' => $key, 'data' => $message]);
+    }
+
+    public static function deleteLogCommand($command){
+        $key = 'console-data-'. $command;
+        return VnConfig::where('type', 'console')->where('name', $key)->delete();
+    }
+
+    public static function getLogCommand($command){
+        $key = 'console-data-'. $command;
+        $data = VnConfig::where('type', 'console')->where('name', $key)->first();
+        if($data){
+            return $data->data;
+        }
+        return '';
+    }
+
+
+    public static function setCommandData($controller, $action, $status = false){
+        $data = [
+            'controller' => $controller,
+            'action' => $action,
+            'time' => time(),
+            'active' => $status
+        ];
+        return VnConfig::updateOrCreate(['type' => 'console', 'name' => 'console'], ['type' => 'console', 'name' => 'console', 'data' => json_encode($data)]);
+    }
+
+
+
+
 
 
 }

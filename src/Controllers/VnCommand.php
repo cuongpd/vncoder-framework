@@ -20,13 +20,13 @@ class VnCommand
     }
 
     public function clearLogs(){
-        RunConsole::setMessage($this->command, "");
+        RunConsole::deleteLogCommand($this->command);
     }
 
     public function saveLogs(){
         $output = $this->output;
-        if(!$output) $output = 'No output';
-        RunConsole::setMessage($this->command, $output);
+        if(!$output) $output = '[__NA__]';
+        RunConsole::logCommand($this->command, $output);
     }
 
     protected function info(...$message)
