@@ -65,11 +65,11 @@ class VnCoderCommand extends Command
             $commandClass->clearLogs();
             $commandClass->$actionName();
             $commandClass->saveLogs();
-            exit();
-        }
-        // Create Command
-        $command_file = COMMAND_PATH. $controllerName. '.php';
-        $command_code = <<<EOF
+        }else{
+            $this->error("Command class $commandController not found.");
+            // Create Command
+            $command_file = COMMAND_PATH. $controllerName. '.php';
+            $command_code = <<<EOF
 <?php
 
 namespace App\Admin\Command;
@@ -84,13 +84,14 @@ class __CONTROLLER__ extends VnCommand{
 }
 
 EOF;
-        if (!file_exists($command_file)) {
-            $command_code = str_replace(['__CONTROLLER__', '__METHOD__'], [$controllerName, $actionName], $command_code);
-            file_put_contents($command_file, $command_code);
-            $this->comment("Command created in $command_file");
-        } else {
-            $this->comment("Please check file $command_file");
+            if (!file_exists($command_file)) {
+                $command_code = str_replace(['__CONTROLLER__', '__METHOD__'], [$controllerName, $actionName], $command_code);
+                file_put_contents($command_file, $command_code);
+                $this->comment("Command created in $command_file");
+            } else {
+                $this->comment("Please check file $command_file");
+            }
+            exit();
         }
-        exit();
     }
 }
