@@ -12,7 +12,6 @@ class VnCoderComposer extends Command
     public function handle()
     {
         $this->updateSymlink();
-        $this->updateMenuAdmin();
     }
 
     protected function updateSymlink()
@@ -34,11 +33,5 @@ class VnCoderComposer extends Command
         }
     }
 
-    protected function updateMenuAdmin(){
-        $menuData = \VnCoder\Backend\Models\VnAdmin::menuData();
-        $htmlData = view('backend::core.menu', ['menuData' => $menuData])->render();
-        file_put_contents(ADMIN_PATH . 'Views/menu/admin.blade.php', $htmlData);
-        echo "Update Menu Admin Success\n";
-    }
 
 }

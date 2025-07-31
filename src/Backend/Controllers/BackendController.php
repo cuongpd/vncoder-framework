@@ -119,11 +119,11 @@ class BackendController extends VnController
     {
         $this->linkCSS('core/plugins/form-ui/bootstrap-maxlength.css');
         $this->linkCSS('core/plugins/form-ui/air-datepicker.css');
-
         $this->linkJS('core/plugins/form-ui/bootstrap-maxlength.js');
         $this->linkJS('core/plugins/form-ui/air-datepicker.js');
         $this->linkJS('core/plugins/form-ui/choices.min.js');
         $this->linkJS('core/plugins/tinymce/tinymce.min.js');
+        $this->linkJS('core/plugins/form-ui/form-init.js');
     }
 
     protected function initFlatpickr()

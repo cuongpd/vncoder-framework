@@ -3,23 +3,25 @@
 if (!function_exists('getParam')) {
     function getParam($param, $default = ''): string
     {
-        $data = $_GET[$param] ?? $_POST[$param] ?? $_REQUEST[$param] ?? $default;
-        return trim($data);
+        foreach ([&$_GET, &$_POST, &$_REQUEST] as &$source) {
+            if (isset($source[$param])) {
+                return trim((string)$source[$param]);
+            }
+        }
+        return trim((string)$default);
     }
 }
 
 if (!function_exists('getParamInt')) {
     function getParamInt($aVarName, $aVarAlt = 0): int
     {
-        return (int)getParam($aVarName, $aVarAlt);
+        return (int) getParam($aVarName, $aVarAlt);
     }
 }
 
 if(!function_exists('convertToInteger')){
     function convertToInteger($str) {
-        $str = str_replace(',', '', $str);
-        $floatValue = (float)$str;
-        return (int)$floatValue;
+        return (int) floatval(str_replace(',', '', $str));
     }
 }
 
@@ -27,15 +29,9 @@ if (!function_exists('formatFileSize')) {
     function formatFileSize($number)
     {
         $number = getNumber($number);
-        if ($number > 999999999) {
-            return round($number / 1000000000, 3) . ' GB';
-        }
-        if ($number > 999999) {
-            return round($number / 1000000, 3) . ' MB';
-        }
-        if ($number > 999) {
-            return round($number / 1000, 3) . ' kB';
-        }
+        if ($number > 999999999) return round($number / 1e9, 3) . ' GB';
+        if ($number > 999999)    return round($number / 1e6, 3) . ' MB';
+        if ($number > 999)       return round($number / 1e3, 3) . ' kB';
         return $number > 0 ? $number . ' Byte' : '';
     }
 }
@@ -44,26 +40,21 @@ if (!function_exists('formatNumberText')) {
     function formatNumberText($number)
     {
         $number = getNumber($number);
-        if ($number > 999999999) {
-            return round($number / 1000000000, 1) . 'B+';
-        }
-        if ($number > 999999) {
-            return round($number / 1000000, 1) . 'M+';
-        }
-        if ($number > 999) {
-            return round($number / 1000, 1) . 'k+';
-        }
+        if ($number >= 1000000000) return round($number / 1000000000, 1) . 'B+';
+        if ($number >= 1000000)    return round($number / 1000000, 1) . 'M+';
+        if ($number >= 1000)       return round($number / 1000, 1) . 'k+';
         return $number > 0 ? $number . '+' : '';
     }
+
 }
 
 if (!function_exists('formatNumber')) {
     function formatNumber($number)
     {
-        if(!is_numeric($number)) return $number;
-        if($number > 1000) return number_format($number);
-        if($number > 10) return number_format($number, 2);
-        return number_format($number, 3);
+        if (!is_numeric($number)) return $number;
+        $abs = abs($number);
+        $decimals = ($abs > 1000) ? 0 : (($abs > 100) ? 1 : (($abs > 10) ? 2 : 3));
+        return number_format($number, $decimals);
     }
 }
 
@@ -71,8 +62,7 @@ if (!function_exists('formatNumber')) {
 if (!function_exists('getNumber')) {
     function getNumber($str)
     {
-        $number = preg_replace("/[^0-9]/", "", $str);
-        return (int)$number;
+        return (int) preg_replace('/\D/', '', $str);
     }
 }
 
@@ -87,10 +77,8 @@ if (!function_exists('stripQuotes')) {
 if (!function_exists('timeFormat')) {
     function timeFormat($duation = 0): string
     {
-        if ($duation < 60) {
-            return $duation . ' phút';
-        }
-        $h = round($duation / 60);
+        if ($duation < 60) return $duation . ' phút';
+        $h = floor($duation / 60);
         $p = $duation % 60;
         return $p === 0 ? $h . ' giờ' : $h . ' giờ ' . $p . ' phút';
     }
@@ -108,20 +96,11 @@ if (!function_exists('encryptNumber')) {
     function encryptNumber($uid)
     {
         $uid = (int)$uid;
-        if ($uid > 17592186044415 || $uid < 0) return -1; // uid from 0 to 17592186044415 ( 16^11 - 1)
+        if ($uid > 17592186044415 || $uid < 0) return -1;
         $md5Data = md5($uid);
-        $firstOutput = substr($md5Data, 0, 4);
-        $secondOutput = substr($md5Data, 6, 4);
-        $threeOutput = substr($md5Data, 12, 4);
-        $fourOutput = substr($md5Data, 18, 4);
-        $fiveOutput = substr($md5Data, 24, 4);
-
-        $uidHexa = $uid + 17592186044416 + 12021990; // Hex : 100000000000 : 12 số
+        $uidHexa = $uid + 17592186044416 + 12021990;
         $uidToHex = dechex($uidHexa);
-        $dechexFirst = substr($uidToHex, 0, 4);
-        $dechexSecond = substr($uidToHex, 4, 4);
-        $dechexLast = substr($uidToHex, -4);
-        return $firstOutput . $dechexFirst . $secondOutput . $dechexSecond . $threeOutput . $dechexLast . $fourOutput . $fiveOutput;
+        return substr($md5Data, 0, 4) . substr($uidToHex, 0, 4) . substr($md5Data, 6, 4) . substr($uidToHex, 4, 4) . substr($md5Data, 12, 4) . substr($uidToHex, -4) . substr($md5Data, 18, 4) . substr($md5Data, 24, 4);
     }
 }
 
@@ -129,44 +108,15 @@ if (!function_exists('decryptNumber')) {
     function decryptNumber($data = '')
     {
         if (strlen($data) == 32) {
-            $dechexFirst = substr($data, 4, 4);
-            $dechexSecond = substr($data, 12, 4);
-            $dechexLast = substr($data, 20, 4);
-            $uidHex = $dechexFirst . $dechexSecond . $dechexLast;
+            $uidHex = substr($data, 4, 4) . substr($data, 12, 4) . substr($data, 20, 4);
             $decData = hexdec($uidHex);
-            $uid = $decData - 17592186044416 - 12021990; // Hex : 10000000
-
+            $uid = $decData - 17592186044416 - 12021990;
             $md5Input = md5($uid);
-            if(substr($md5Input, 0, 4) == substr($data, 0, 4) && substr($md5Input, 6, 4) == substr($data, 8, 4) && substr($md5Input, 12, 4) == substr($data, 16, 4) && substr($md5Input, 18, 4) == substr($data, 24, 4) && substr($md5Input, 24, 4) == substr($data, 28, 4)){
+            if (substr($md5Input, 0, 4) == substr($data, 0, 4) && substr($md5Input, 6, 4) == substr($data, 8, 4) && substr($md5Input, 12, 4) == substr($data, 16, 4) && substr($md5Input, 18, 4) == substr($data, 24, 4) && substr($md5Input, 24, 4) == substr($data, 28, 4)) {
                 return $uid;
             }
         }
         return 0;
-    }
-}
-
-if (!function_exists('index_code')) {
-    function index_code($number, $len = 3)
-    {
-        $indexCode = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-        $code = '';
-        while ($number != '0') {
-            $code .= $indexCode[bcmod($number, '36')];
-            $number = bcdiv($number, '36', 0);
-        }
-
-        if (strlen($code) < $len) {
-            $code = str_repeat("a", $len - strlen($code)) . $code;
-        }
-        return $code;
-    }
-}
-
-if(!function_exists('numberToCode')){
-    function numberToCode($number, $len = 4){
-        $number = 120290 + $number + rand(1,35);
-        return index_code($number, $len);
-
     }
 }
 
@@ -197,21 +147,20 @@ if (!function_exists('formBuilderManager')) {
         }
 
         foreach ($formData as $key => $item) {
+            $item['col'] = $item['col'] ?? 12;
+            $item['value'] = $item['value'] ?? '';
+            $item['helper'] = $item['helper'] ?? '';
+            $item['type'] = $item['type'] ?? 'text';
+            $item['label'] = $item['label'] ?? ucfirst($key);
+            $item['placeholder'] = $item['placeholder'] ?? $item['label'];
+            $item['required'] = isset($item['required']) && $item['required'] ? ' required' : '';
+            $item['options'] = $item['options'] ?? [];
+            if($item['type'] == 'file' || $item['type'] == 'photo' || $item['type'] == 'video' || $item['type'] == 'audio') $hasFileInput = true;
+
             if($item['type'] == 'header'){
                 $html .= '<div class="col-12"><h4 class="form-header">'.$item['label'].'</h4></div>';
                 continue;
             }
-
-            if($item['type'] == 'file' || $item['type'] == 'photo' || $item['type'] == 'video' || $item['type'] == 'audio') $hasFileInput = true;
-            $item['required'] = isset($item['required']) && $item['required'] ? ' required' : '';
-            if (!isset($item['value'])) $item['value'] = '';
-            if (!isset($item['helper'])) $item['helper'] = '';
-            if (!isset($item['type'])) $item['type'] = 'text';
-            if (!isset($item['col'])) $item['col'] = 12;
-            if (!isset($item['label'])) $item['label'] = ucfirst($key);
-            if (!isset($item['options'])) $item['options'] = [];
-            $item['placeholder'] = isset($item['placeholder']) ? $item['placeholder'] : $item['label'];
-
 
             if ($item['required']) $item['label'] .= ' (*)';
             if ($item['type'] == 'hidden') {
