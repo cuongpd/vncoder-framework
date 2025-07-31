@@ -18,14 +18,12 @@ class QueueConsoleCommand extends Command
         $artisanCommand = $action ?  'run ' . $controller . ' ' . $action . ' --queue' : 'run ' . $controller . ' --queue';
         logData('console', "Call command 'php artisan run {$artisanCommand}'");
         if($controller && !$active){
-            RunConsole::setCommandActive();
+            RunConsole::activeCommand();
             try {
                 Artisan::call($artisanCommand);
                 logData('console', "Command 'php artisan run {$artisanCommand}' executed successfully.");
-                RunConsole::removeCommand();
             } catch (\Exception $e) {
                 logData('console', "Error running command '{$consoleCommand}': " . $e->getMessage());
-                RunConsole::removeCommand();
             } finally {
                 RunConsole::removeCommand();
             }

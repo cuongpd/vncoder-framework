@@ -52,19 +52,18 @@ class VnCoderCommand extends Command
             $commandClass = app()->make($commandController);
             if (!method_exists($commandClass, 'VnCommandInit')) {
                 $this->error("Please extends \VnCommand to call : $commandController");
-                exit();
+            }else{
+                if (!method_exists($commandClass, $actionName)) {
+                    $this->error("Method $actionName not active in class $commandController");
+                }else{
+                    $commandClass->command = $command;
+                    if($runInQueue){
+                        $commandClass->runInQueue();
+                    }
+                    $commandClass->$actionName();
+                    $commandClass->saveCommandLog();
+                }
             }
-            if (!method_exists($commandClass, $actionName)) {
-                $this->error("Method $actionName not active in class $commandController");
-                exit();
-            }
-            $commandClass->command = $command;
-            if($runInQueue){
-                $commandClass->runInQueue = true;
-            }
-            $commandClass->clearLogs();
-            $commandClass->$actionName();
-            $commandClass->saveLogs();
         }else{
             $this->error("Command class $commandController not found.");
             // Create Command

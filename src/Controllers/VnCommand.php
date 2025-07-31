@@ -2,6 +2,7 @@
 
 namespace VnCoder\Controllers;
 
+use Illuminate\Support\Facades\Artisan;
 use VnCoder\Models\RunConsole;
 
 class VnCommand
@@ -12,7 +13,6 @@ class VnCommand
     public string $command = "";
     protected string $output = "";
 
-
     public function __construct()
     {
         while (ob_get_level() > 0) {
@@ -21,15 +21,22 @@ class VnCommand
         ob_implicit_flush(true);
     }
 
-    public function clearLogs(){
-        if($this->runInQueue) RunConsole::deleteLogCommand($this->command);
+    public function runInQueue()
+    {
+        $this->runInQueue = true;
+        $this->print("Run command : " . $this->command);
     }
 
-    public function saveLogs(){
+    public function saveCommandLog(){
         if(!$this->runInQueue) return;
-        $output = $this->output;
-        if(!$output) $output = '[__NA__]';
-        RunConsole::logCommand($this->command, $output);
+        RunConsole::setCommandLog($this->output);
+    }
+
+    protected function runComand($command){
+        $this->print("Running command: $command");
+        $runComand = 'run ' . trim($command) . ($this->runInQueue ? ' --queue' : '');
+        Artisan::call($runComand);
+        $this->sleep(1);
     }
 
     protected function info(...$message)

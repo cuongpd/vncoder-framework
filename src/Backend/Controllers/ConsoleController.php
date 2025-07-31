@@ -31,20 +31,16 @@ class ConsoleController extends BackendController
 
     public function Run_Data_Action(){
         $currentCommand = RunConsole::getCommandData();
-        if(!$currentCommand){
-            RunConsole::removeCommand();
-            return $this->toJsonData('');
-        }
-        $active = $currentCommand['active'] ?? false;
-        if($active){
-            $message = RunConsole::getMessage();
-            if($message){
-                if($message == '[__NA__]') $message = 'Đã xử lý xong lệnh!';
-                return $this->toJsonData($message);
+        if($currentCommand){
+            if($currentCommand['active'] ?? false){
+                $messageData = RunConsole::getMessage(false);
+                return response()->json($messageData);
+            }else{
+                return response()->json(['message' => 'Lệnh đang trong hàng đợi, vui lòng đợi trong giây lát!...', 'status' => 0]);
             }
-            return $this->toJsonError('Đang chạy lệnh, vui lòng đợi trong giây lát!...');
         }else{
-            return $this->toJsonError('Lệnh đang trong hàng đợi, vui lòng đợi trong giây lát!...');
+            $messageData = RunConsole::getMessage(true);
+            return response()->json($messageData);
         }
     }
 

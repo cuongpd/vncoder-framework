@@ -14,7 +14,7 @@
 </form>
 @if($isConsoleRunning)
     <div class="alert alert-warning" id="is_console_running">
-        <strong>Chú ý:</strong> Đang thực thi lệnh <strong>{{$currentCommand}}</strong>. Vui lòng đợi cho đến khi lệnh hoàn thành.
+        <strong>Chú ý:</strong> Đang thực thi lệnh <strong> {{$currentCommand}} </strong>. Vui lòng đợi cho đến khi lệnh hoàn thành.
     </div>
 @endif
 <div class="container mt-4">
@@ -31,13 +31,13 @@
                 method: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    if (response.status === 1) {
-                        $('#data-container').text(response.data);
+                    if (response.status === 0) {
+                        $('#data-container').text(response.message);
+                    } else {
+                        $('#data-container').text(response.message);
                         $('#is_console_running').hide();
                         clearInterval(intervalId);
                         $('#form-data').show();
-                    } else {
-                        $('#data-container').text(response.message);
                     }
                 },
                 error: function(xhr, status, error) {
@@ -47,7 +47,7 @@
             });
         }
         fetchData();
-        intervalId = setInterval(fetchData, 10000);
+        intervalId = setInterval(fetchData, 1000);
     });
 </script>
 @endpush

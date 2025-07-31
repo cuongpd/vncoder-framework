@@ -274,5 +274,29 @@ class VnConfig extends VnModelBase
         return 'text';
     }
 
+    public static function deleteConsole($name)
+    {
+        return self::where('type', 'console')->where('name', $name)->delete();
+    }
+
+    public static function deleteConsoleData()
+    {
+        return self::where('type', 'console')->delete();
+    }
+
+    public static function getConsoleData($name, $decode = true)
+    {
+        $data = self::where('type', 'console')->where('name', $name)->first();
+        return $decode && $data ? json_decode($data->data, true) : ($data->data ?? []);
+    }
+
+    public static function setConsoleData($name, $value, $encode = true)
+    {
+        return VnConfig::updateOrCreate(
+            ['type' => 'console', 'name' => $name],
+            ['type' => 'console', 'name' => $name, 'data' => $encode ? json_encode($value) : $value]
+        );
+    }
+
 
 }
