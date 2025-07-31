@@ -80,7 +80,6 @@ class RunConsole
         return '';
     }
 
-
     public static function setCommandData($controller, $action, $status = false){
         $data = [
             'controller' => $controller,

@@ -4,29 +4,29 @@ namespace VnCoder\Helper\GeoIP;
 
 class Metadata
 {
-    private $binaryFormatMajorVersion;
-    private $binaryFormatMinorVersion;
-    private $buildEpoch;
-    private $databaseType;
-    private $description;
-    private $ipVersion;
-    private $languages;
-    private $nodeByteSize;
-    private $nodeCount;
-    private $recordSize;
-    private $searchTreeSize;
+    private int $binaryFormatMajorVersion;
+    private int $binaryFormatMinorVersion;
+    private int $buildEpoch;
+    private string $databaseType;
+    private array $description;
+    public int $ipVersion;
+    private array $languages;
+    public int $nodeByteSize;
+    public int $nodeCount;
+    public int $recordSize;
+    public int $searchTreeSize;
 
     public function __construct($metadata)
     {
-        $this->binaryFormatMajorVersion = $metadata['binary_format_major_version'];
-        $this->binaryFormatMinorVersion = $metadata['binary_format_minor_version'];
-        $this->buildEpoch = $metadata['build_epoch'];
-        $this->databaseType = $metadata['database_type'];
-        $this->languages = $metadata['languages'];
-        $this->description = $metadata['description'];
-        $this->ipVersion = $metadata['ip_version'];
-        $this->nodeCount = $metadata['node_count'];
-        $this->recordSize = $metadata['record_size'];
+        $this->binaryFormatMajorVersion = $metadata['binary_format_major_version'] ?? 2;
+        $this->binaryFormatMinorVersion = $metadata['binary_format_minor_version'] ?? 0;
+        $this->buildEpoch = $metadata['build_epoch'] ?? time();
+        $this->databaseType = $metadata['database_type'] ?? 'GeoIP2-Country';
+        $this->languages = $metadata['languages'] ?? [];
+        $this->description = $metadata['description'] ?? [];
+        $this->ipVersion = $metadata['ip_version'] ?? 6;
+        $this->nodeCount = $metadata['node_count'] ?? 0;
+        $this->recordSize = $metadata['record_size'] ?? 24;
         $this->nodeByteSize = $this->recordSize / 4;
         $this->searchTreeSize = $this->nodeCount * $this->nodeByteSize;
     }

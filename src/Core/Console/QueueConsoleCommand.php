@@ -15,7 +15,7 @@ class QueueConsoleCommand extends Command
         $controller = $consoleCommand['controller'] ?? '';
         $action = $consoleCommand['action'] ?? '';
         $active = $consoleCommand && isset($consoleCommand['active']) ? $consoleCommand['active'] : false;
-        $artisanCommand = 'run ' . $controller . ($action ? ' ' . $action : '');
+        $artisanCommand = $action ?  'run ' . $controller . ' ' . $action . ' --queue' : 'run ' . $controller . ' --queue';
         logData('console', "Call command 'php artisan run {$artisanCommand}'");
         if($controller && !$active){
             RunConsole::setCommandActive();

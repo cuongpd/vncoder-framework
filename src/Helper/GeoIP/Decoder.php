@@ -6,11 +6,14 @@ use Exception;
 
 class Decoder
 {
+    /**
+     * @var resource Stream resource từ fopen hoặc tương đương
+     */
     private $fileStream;
-    private $pointerBase;
+    private int $pointerBase;
 
-    private $pointerTestHack;
-    private $switchByteOrder;
+    private bool $pointerTestHack;
+    private bool $switchByteOrder;
 
     private array $types = [
         0 => 'extended',
@@ -31,15 +34,10 @@ class Decoder
         15 => 'float',
     ];
 
-    public function __construct(
-        $fileStream,
-        $pointerBase = 0,
-        $pointerTestHack = false
-    ) {
+    public function __construct($fileStream, $pointerBase = 0, $pointerTestHack = false) {
         $this->fileStream = $fileStream;
         $this->pointerBase = $pointerBase;
         $this->pointerTestHack = $pointerTestHack;
-
         $this->switchByteOrder = $this->isPlatformLittleEndian();
     }
 
@@ -54,9 +52,7 @@ class Decoder
             if ($this->pointerTestHack) {
                 return [$pointer];
             }
-
             list($result) = $this->decode($pointer);
-
             return [$result, $offset];
         }
 
@@ -66,13 +62,11 @@ class Decoder
             if ($typeNum < 8) {
                 throw new Exception('Something went horribly wrong in the decoder. An extended type resolved to a type number < 8 (' . $this->types[$typeNum] . ')');
             }
-
             $type = $this->types[$typeNum];
             $offset++;
         }
 
         list($size, $offset) = $this->sizeFromCtrlByte($ctrlByte, $offset);
-
         return $this->decodeByType($type, $offset, $size);
     }
 
@@ -94,11 +88,9 @@ class Decoder
                 return [$this->decodeString($bytes), $newOffset];
             case 'double':
                 $this->verifySize(8, $size);
-
                 return [$this->decodeDouble($bytes), $newOffset];
             case 'float':
                 $this->verifySize(4, $size);
-
                 return [$this->decodeFloat($bytes), $newOffset];
             case 'bytes':
                 return [$bytes, $newOffset];

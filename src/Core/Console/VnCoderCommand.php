@@ -7,7 +7,7 @@ use JetBrains\PhpStorm\NoReturn;
 
 class VnCoderCommand extends Command
 {
-    protected $signature = 'run {controller} {action?}';
+    protected $signature = 'run {controller} {action?} {--queue}';
     protected $description = "Lumen Command : php artisan run {run-command} {action?}";
 
     #[NoReturn]
@@ -27,6 +27,7 @@ class VnCoderCommand extends Command
         }
         $action = $this->argument('action');
         $command = $controller . ($action ? '__' . $action : '');
+        $runInQueue = $this->option('queue');
 
         if (preg_match('/^\d/', $controller)) {
             $controller = 'N'. $controller;
@@ -58,6 +59,9 @@ class VnCoderCommand extends Command
                 exit();
             }
             $commandClass->command = $command;
+            if($runInQueue){
+                $commandClass->runInQueue = true;
+            }
             $commandClass->clearLogs();
             $commandClass->$actionName();
             $commandClass->saveLogs();

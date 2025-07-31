@@ -507,24 +507,8 @@ function convertNumber($number) {
 
 if(!function_exists('ipInfo')){
     function ipInfo($ip = '127.0.0.1'){
-        $data = ['code' => 'OTHER', 'name' => 'Other'];
-        $geoDatabase = VNCODER_CORE_PATH . 'database/geoip/GeoLite2-Country.mmdb';
-        $dbReader = new Reader($geoDatabase);
-        $info = $dbReader->get($ip);
-        if ($info) {
-            $data['code'] = $info['country']['iso_code'] ?? '';
-            $data['name'] = $info['country']['names']['en'] ?? '';
-        }
-        return $data;
-    }
-}
-
-if(!function_exists('ipCountry')){
-    function ipCountry($ip = '127.0.0.1')
-    {
-        $countryCode = "OTHER";
-        $geoDatabase = VNCODER_CORE_PATH . 'database/geoip/GeoLite2-Country.mmdb';
-        $dbReader = new Reader($geoDatabase);
+        $countryCode = "Z0";
+        $dbReader = new Reader();
         $info = $dbReader->get($ip);
         if ($info && isset($info['country']['iso_code'])) {
             $countryCode = $info['country']['iso_code'];

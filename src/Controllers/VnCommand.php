@@ -8,8 +8,10 @@ class VnCommand
 {
     protected bool $runInConsole = true;
     protected array $tableKey = [];
+    public bool $runInQueue = false;
     public string $command = "";
     protected string $output = "";
+
 
     public function __construct()
     {
@@ -20,10 +22,11 @@ class VnCommand
     }
 
     public function clearLogs(){
-        RunConsole::deleteLogCommand($this->command);
+        if($this->runInQueue) RunConsole::deleteLogCommand($this->command);
     }
 
     public function saveLogs(){
+        if(!$this->runInQueue) return;
         $output = $this->output;
         if(!$output) $output = '[__NA__]';
         RunConsole::logCommand($this->command, $output);

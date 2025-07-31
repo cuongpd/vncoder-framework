@@ -32,10 +32,8 @@ class VnController extends Controller
 
     public function views($bladeName, $isBackendCore = false)
     {
-        if(!$this->isBackend){
-            if($this->metaData->gdpr_status && !cookie('cc-bar-cookies')){
-                $this->initCookieBar($this->metaData->gdpr_message);
-            }
+        if (!$this->isBackend && !cookie('cc-bar-cookies') && !empty($this->metaData->gdpr_status)) {
+            $this->initCookieBar($this->metaData->gdpr_message);
         }
 
         $this->setData['__currentUrl'] = request()->url();

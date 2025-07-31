@@ -16,5 +16,6 @@ class Util
                 return $value;
             }
         }
+        throw new \Exception("Failed to read $numberOfBytes bytes from stream at offset $offset");
     }
 }
