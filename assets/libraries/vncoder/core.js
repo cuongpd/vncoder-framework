@@ -178,7 +178,7 @@ var vncoder = {
         if (!vncoder.is.string(message)) return;
         jQuery(".float-text").remove();
         jQuery("body").append('<div class="float-text">' + message + "</div>");
-        jQuery(".float-loading").fadeTo("fast", 0.85);
+        jQuery(".float-text").fadeTo("fast", 0.85);
         setTimeout(() => {
             jQuery(".float-text").fadeTo("slow", 0, function() {
                 jQuery(this).remove();
