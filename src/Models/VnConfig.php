@@ -68,8 +68,10 @@ class VnConfig extends VnModelBase
         if (!$configData || $update) {
             $configData = newObject();
             $configQuery = self::getCacheData($type, true);
-            foreach ($configQuery as $key => $item) {
-                $configData->$key = $item['data'];
+            if($configQuery){
+                foreach ($configQuery as $key => $item) {
+                    $configData->$key = $item['data'];
+                }
             }
             cache($cacheKey, $configData, 86400);
         }
