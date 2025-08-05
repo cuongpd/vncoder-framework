@@ -86,6 +86,9 @@ class BackendController extends VnController
         if ($this->usingFormEditor) {
             $this->initFormEditor();
         }
+        if(!$bladeName) {
+            $bladeName = $this->action;
+        }
         if ($this->isBackendCore || $isBackendCore) {
             $this->setData['__bladeYieldRender'] = 'backend::pages.' . $bladeName;
         } else {

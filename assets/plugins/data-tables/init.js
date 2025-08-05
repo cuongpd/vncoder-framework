@@ -163,7 +163,7 @@ dataTableDefaults.columnDefs = [
         targets: "photo",
         render: function (data, type) {
             if (type === 'display' && data && (typeof data === 'string')) {
-                return `<img src="${data}" class="img-thumbnail dt-photo dt-img-hover" style="max-height: 80px; cursor: zoom-in;" />`;
+                return `<div style="text-align: center;"><img src="${data}" class="img-thumbnail dt-photo dt-img-hover" style="max-height: 80px; cursor: zoom-in;" /></div>`;
             }
             return data;
         }
@@ -172,7 +172,7 @@ dataTableDefaults.columnDefs = [
         targets: "photo200",
         render: function (data, type) {
             if (type === 'display' && data && (typeof data === 'string')) {
-                return `<img src="${data}" class="img-thumbnail dt-photo dt-img-hover" style="max-height: 200px; cursor: zoom-in;" />`;
+                return `<div style="text-align: center;"><img src="${data}" class="img-thumbnail dt-photo dt-img-hover" style="max-height: 200px; cursor: zoom-in;" /></div>`;
             }
             return data;
         }
