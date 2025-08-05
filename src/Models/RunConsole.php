@@ -96,6 +96,6 @@ class RunConsole
 
     protected static function deleteConfigData($name)
     {
-        return VnConfig::deleteConsole($name)->delete();
+        return VnConfig::deleteConsole($name);
     }
 }
