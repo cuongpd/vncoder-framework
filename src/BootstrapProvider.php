@@ -132,6 +132,9 @@ class BootstrapProvider extends ServiceProvider
 
         $this->app->router->get('maintenance.html', function (){
             $maintenanceData = VnConfig::getMaintenanceData();
+            if($maintenanceData['status'] == 0){
+                return redirect()->to('/');
+            }
             return view('core::page.maintenance', $maintenanceData);
         });
 

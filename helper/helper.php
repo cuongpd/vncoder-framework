@@ -642,22 +642,3 @@ if (!function_exists('measure')) {
         return debugbar()->measure($label, $closure);
     }
 }
-
-if (!function_exists('appVersion')) {
-    function appVersion($update = false)
-    {
-        $versionFile = STORAGE_PATH . 'framework/database/version.txt';
-        $cacheKey = 'vn-app-version';
-        $appVersion = cache($cacheKey);
-        if ($appVersion === null || $update) {
-            $content = trim(get_contents($versionFile));
-            $currentVersion = is_numeric($content) ? (int) $content : 0;
-            $newVersion = $currentVersion + 1;
-            if (put_contents($versionFile, (string)$newVersion)) {
-                cache('vn-app-version', $newVersion, 60 * 24 * 30); // cập nhật lại cache
-            }
-        }
-
-        return 'v' . $appVersion;
-    }
-}

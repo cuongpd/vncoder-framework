@@ -192,14 +192,23 @@ class VnConfig extends VnModelBase
         flash_message('Setting has been updated', 'success');
     }
 
-    public static function getMaintenanceData()
+    public static function getMaintenanceData($update = false)
     {
-        $maintenanceContent = get_contents(STORAGE_PATH . 'framework/database/maintenance.json');
-        $maintenanceData = json_decode($maintenanceContent, true);
+        if(!$update){
+            $maintenanceData = self::getConfigData('maintenance');
+            $status = $maintenanceData->status ?? 0;
+            $heading = $maintenanceData->heading ?? '';
+            $message = $maintenanceData->message ?? '';
+        }else{
+            $maintenanceData = self::select('name', 'data')->where('type', 'maintenance')->pluck('data', 'name');
+            $status = $maintenanceData['status'] ?? 0;
+            $heading = $maintenanceData['heading'] ?? '';
+            $message = $maintenanceData['message'] ?? '';
+        }
         return [
-            'status' => $maintenanceData['status'] ?? 0,
-            'heading' => $maintenanceData['heading'] ?? 'The site is under maintenance',
-            'message' => $maintenanceData['message'] ?? ''
+            'status' => $status,
+            'heading' => $heading,
+            'message' => $message
         ];
     }
 
@@ -207,21 +216,31 @@ class VnConfig extends VnModelBase
     {
         $maintenanceData = self::getMaintenanceData();
         return [
-            'status' => ['label' => '', 'col' => 2, 'type' => 'checkbox', 'value' => $maintenanceData['status'], 'required' => '', 'placeholder' => 'Bật chế độ bảo trì website'],
-            'heading' => ['label' => 'Tiêu đề thông báo', 'col' => 10, 'type' => 'text', 'value' => $maintenanceData['heading'], 'required' => ''],
+            'status' => ['label' => '', 'col' => 12, 'type' => 'checkbox', 'value' => $maintenanceData['status'], 'required' => '', 'placeholder' => 'Bật chế độ bảo trì website'],
+            'heading' => ['label' => 'Tiêu đề thông báo', 'col' => 12, 'type' => 'text', 'value' => $maintenanceData['heading'], 'required' => ''],
             'message' => ['label' => 'Nội dung thông báo', 'col' => 12, 'type' => 'editor', 'value' => $maintenanceData['message'], 'required' => ''],
         ];
     }
 
     public static function saveMaintenanceConfig(Request $request)
     {
-        $data = $request->all();
-        $updateData = [
-            'status' => $data['status'] ?? 0,
-            'heading' => $data['heading'] ?? '',
-            'message' => $data['message'] ?? ''
-        ];
-        put_contents(STORAGE_PATH . 'framework/database/maintenance.json', json_encode($updateData, JSON_PRETTY_PRINT));
+        $status = $request->input('status', 0);
+        $message = $request->input('message', '');
+        $heading = $request->input('heading', '');
+        self::updateOrCreate(
+            ['type' => 'maintenance', 'name' => 'status'],
+            ['type' => 'maintenance', 'name' => 'status', 'data' => $status]
+        );
+        self::updateOrCreate(
+            ['type' => 'maintenance', 'name' => 'heading'],
+            ['type' => 'maintenance', 'name' => 'heading', 'data' => $heading]
+        );
+        self::updateOrCreate(
+            ['type' => 'maintenance', 'name' => 'message'],
+            ['type' => 'maintenance', 'name' => 'message', 'data' => $message]
+        );
+
+        self::updateCacheData('maintenance');
         flash_message('Setting has been updated');
     }
     
@@ -292,5 +311,19 @@ class VnConfig extends VnModelBase
         );
     }
 
+    public static function appVersion($update = false){
+        $versionName = cache('core-app-version');
+        if(!$versionName || $update){
+            $versionData = self::where('type', 'app')->where('name', 'version')->first();
+            if($versionData){
+                $versionName = (int) $versionData->data + 1;
+                self::where('id', $versionData->id)->update(['data' => $versionName]);
+            }else{
+                $versionName = 100;
+                self::updateOrCreate(['type' => 'app', 'name' => 'version'], ['type' => 'app', 'name' => 'version', 'data' => $versionName]);
+            }
+        }
+        return 'v' . number_format($versionName / 100, 2);
+    }
 
 }

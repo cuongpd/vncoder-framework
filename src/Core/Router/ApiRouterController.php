@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use OpenApi\Generator;
 use VnCoder\Helper\DatabaseHelper;
 use Laravel\Lumen\Routing\Controller;
+use VnCoder\Models\VnConfig;
 
 class ApiRouterController extends Controller
 {
@@ -53,11 +54,12 @@ class ApiRouterController extends Controller
         $dbHelper = new DatabaseHelper();
         $dbHelper->updateDatabase();
         logData('git-update', $gitMessage);
-        appVersion(true);
+        $version = VnConfig::appVersion(true);
         return response()->json([
             'status'    => 1 ,
             'gitMessage'     => $gitMessage,
             'databaseMessage'     => $dbHelper->getMessage(),
+            'version' => $version,
         ], 200, [], JSON_PRETTY_PRINT);
     }
 

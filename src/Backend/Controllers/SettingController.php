@@ -68,17 +68,4 @@ class SettingController extends BackendController
         return $this->redirectUrl('maintenance-mode');
     }
 
-    public function Options_Action(){
-        $this->metaData->title = 'Tùy chỉnh hệ thống Website';
-        $this->usingFormEditor = true;
-        $this->setData['settingForm'] = VnConfig::getOptionsConfigForm();
-        return $this->views('setting.form');
-    }
-
-    public function Options_Action_Submit(Request $request){
-        VnConfig::saveOptionsConfigForm($request);
-        return $this->redirectUrl('options');
-    }
-
-
 }
