@@ -37,7 +37,7 @@ class VnCoderComposer extends Command
 
         if (!file_exists($databaseGitIgnore)) {
             echo "Create .gitignore file in " . $databaseGitIgnore . "\n";
-            put_contents($databaseGitIgnore, "*\nsql.json\n!.gitignore\n");
+            put_contents($databaseGitIgnore, "*\n!sql.json\n!.gitignore\n");
         }
 
         if (file_exists($frameworkGitIgnore)) {
