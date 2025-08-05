@@ -550,31 +550,33 @@ if(!function_exists('json_content')){
 }
 
 if (!function_exists('get_contents')) {
-    function get_contents($filename) {
-        if(file_exists($filename)){
-            return file_get_contents($filename);
-        }
-        return "";
+    function get_contents(string $filename): string
+    {
+        return is_file($filename) ? file_get_contents($filename) : '';
     }
 }
 
-if(!function_exists('put_contents')){
-    function put_contents($file, $data){
+if (!function_exists('put_contents')) {
+    function put_contents(string $file, string $data): bool
+    {
         $dir = dirname($file);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
+        if (!is_dir($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
+            return false;
         }
+
         $fp = fopen($file, 'c+');
-        if ($fp === false) return false;
+        if (!$fp) return false;
+        $success = false;
         if (flock($fp, LOCK_EX)) {
             ftruncate($fp, 0);
             rewind($fp);
-            fwrite($fp, $data);
+            $written = fwrite($fp, $data);
             fflush($fp);
             flock($fp, LOCK_UN);
+            $success = ($written !== false);
         }
         fclose($fp);
-        return true;
+        return $success;
     }
 }
 
@@ -641,3 +643,31 @@ if (!function_exists('measure')) {
     }
 }
 
+if (!function_exists('getAppVersion')) {
+    function getAppVersion(): string
+    {
+        $cacheKey = 'vn-app-version';
+        $appVersion = cache($cacheKey);
+        if ($appVersion === null) {
+            $versionFile = STORAGE_PATH . '/framework/version.txt';
+            $content = trim(get_contents($versionFile));
+            $appVersion = is_numeric($content) ? (int) $content : 1;
+            cache($cacheKey, $appVersion, 60 * 24 * 30); // cache 30 ngày
+        }
+
+        return 'v' . $appVersion;
+    }
+}
+
+if (!function_exists('setAppVersion')) {
+    function setAppVersion(): void
+    {
+        $versionFile = STORAGE_PATH . '/framework/version.txt';
+        $content = trim(get_contents($versionFile));
+        $currentVersion = is_numeric($content) ? (int) $content : 0;
+        $newVersion = $currentVersion + 1;
+        if (put_contents($versionFile, (string)$newVersion)) {
+            cache('vn-app-version', $newVersion, 60 * 24 * 30); // cập nhật lại cache
+        }
+    }
+}

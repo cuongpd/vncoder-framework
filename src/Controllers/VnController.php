@@ -19,8 +19,11 @@ class VnController extends Controller
     protected string $extraFooterJS = '';
     public function __construct()
     {
-        $version = env('APP_ENV', 'production') === 'local' ? TIME_NOW : env('APP_VERSION', '1.0');
-        $this->version = 'v' . $version;
+        if(env('APP_ENV', 'production') === 'local'){
+            $this->version = 'd' . TIME_NOW;
+        }else{
+            $this->version = getAppVersion();
+        }
         $this->metaData = VnConfig::getWebConfig();
         $this->metaData->baseUrl = url();
         $this->metaData->version = $this->version;
