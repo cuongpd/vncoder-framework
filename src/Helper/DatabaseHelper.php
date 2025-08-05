@@ -42,15 +42,12 @@ class DatabaseHelper
 
     public function saveCurrentDatabase(){
         $tableData = $this->getCurrentDatabase();
-        file_put_contents(storage_path('framework/database/sql.json'), json_encode($tableData));
+        file_put_contents( STORAGE_PATH . 'sql.json', json_encode($tableData));
     }
 
     public function getUpdateDatabase(){
-        $sqlUpdate = storage_path('framework/database/sql.json');
-        if(!file_exists($sqlUpdate)){
-            return [];
-        }
-        return json_decode(file_get_contents($sqlUpdate), true);
+        $sqlContent = get_contents(STORAGE_PATH . 'sql.json');
+        return $sqlContent ? json_decode($sqlContent, true) : [];
     }
 
     public function getMessage(){
