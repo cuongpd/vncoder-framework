@@ -192,20 +192,15 @@ class VnConfig extends VnModelBase
         flash_message('Setting has been updated', 'success');
     }
 
-    public static function getMaintenanceFile(){
-        return storage_path('framework/maintenance.json');
-    }
     public static function getMaintenanceData()
     {
-        $status = 0; $heading = ''; $message = '';
-        $maintenanceFile = self::getMaintenanceFile();
-        if(file_exists($maintenanceFile)){
-            $maintenanceData = json_decode(file_get_contents($maintenanceFile), true);
-            $status = $maintenanceData['status'] ?? 0;
-            $heading = $maintenanceData['heading'] ?? 'The site is under maintenance';
-            $message = $maintenanceData['message'] ?? '';
-        }
-        return ['status' => $status, 'heading' => $heading, 'message' => $message];
+        $maintenanceContent = get_contents(STORAGE_PATH . 'framework/database/maintenance.json');
+        $maintenanceData = json_decode($maintenanceContent, true);
+        return [
+            'status' => $maintenanceData['status'] ?? 0,
+            'heading' => $maintenanceData['heading'] ?? 'The site is under maintenance',
+            'message' => $maintenanceData['message'] ?? ''
+        ];
     }
 
     public static function getMaintenanceConfigForm()
@@ -226,8 +221,7 @@ class VnConfig extends VnModelBase
             'heading' => $data['heading'] ?? '',
             'message' => $data['message'] ?? ''
         ];
-        $maintenanceFile = self::getMaintenanceFile();
-        file_put_contents($maintenanceFile, json_encode($updateData, JSON_PRETTY_PRINT));
+        put_contents(STORAGE_PATH . 'framework/database/maintenance.json', json_encode($updateData, JSON_PRETTY_PRINT));
         flash_message('Setting has been updated');
     }
     

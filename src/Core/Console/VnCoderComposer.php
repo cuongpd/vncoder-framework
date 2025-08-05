@@ -31,6 +31,27 @@ class VnCoderComposer extends Command
             echo "Symlink folder " . $assetsFolder . " to ". $assetsFolderSymlink . "\n";
             symlink($assetsFolder, $assetsFolderSymlink);
         }
+
+        $frameworkGitIgnore = STORAGE_PATH . 'framework' . DIRECTORY_SEPARATOR . '.gitignore';
+        $databaseGitIgnore = STORAGE_PATH . 'framework' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . '.gitignore';
+
+        if (!file_exists($databaseGitIgnore)) {
+            echo "Create .gitignore file in " . $databaseGitIgnore . "\n";
+            put_contents($databaseGitIgnore, "*\nsql.json\n!.gitignore\n");
+        }
+
+        if (file_exists($frameworkGitIgnore)) {
+            $content = file_get_contents($frameworkGitIgnore);
+            if (!str_contains($content, '!database/')) {
+                echo "Add '!database/' to " . $frameworkGitIgnore . "\n";
+                $content = rtrim($content) . "\n!database/\n";
+                put_contents($frameworkGitIgnore, $content);
+            }
+        } else {
+            echo "Create .gitignore file in " . $frameworkGitIgnore . "\n";
+            put_contents($frameworkGitIgnore, "*\n!cache/\n!database/\n!debugbar/\n!sessions/\n!views/\n!.gitignore\n");
+        }
+
     }
 
 

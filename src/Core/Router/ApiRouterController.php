@@ -53,7 +53,7 @@ class ApiRouterController extends Controller
         $dbHelper = new DatabaseHelper();
         $dbHelper->updateDatabase();
         logData('git-update', $gitMessage);
-        setAppVersion();
+        appVersion(true);
         return response()->json([
             'status'    => 1 ,
             'gitMessage'     => $gitMessage,

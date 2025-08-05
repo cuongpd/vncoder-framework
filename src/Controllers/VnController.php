@@ -22,7 +22,7 @@ class VnController extends Controller
         if(env('APP_ENV', 'production') === 'local'){
             $this->version = 'd' . TIME_NOW;
         }else{
-            $this->version = getAppVersion();
+            $this->version = appVersion();
         }
         $this->metaData = VnConfig::getWebConfig();
         $this->metaData->baseUrl = url();

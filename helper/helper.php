@@ -643,31 +643,21 @@ if (!function_exists('measure')) {
     }
 }
 
-if (!function_exists('getAppVersion')) {
-    function getAppVersion(): string
+if (!function_exists('appVersion')) {
+    function appVersion($update = false)
     {
+        $versionFile = STORAGE_PATH . 'framework/database/version.txt';
         $cacheKey = 'vn-app-version';
         $appVersion = cache($cacheKey);
-        if ($appVersion === null) {
-            $versionFile = STORAGE_PATH . '/framework/version.txt';
+        if ($appVersion === null || $update) {
             $content = trim(get_contents($versionFile));
-            $appVersion = is_numeric($content) ? (int) $content : 1;
-            cache($cacheKey, $appVersion, 60 * 24 * 30); // cache 30 ngày
+            $currentVersion = is_numeric($content) ? (int) $content : 0;
+            $newVersion = $currentVersion + 1;
+            if (put_contents($versionFile, (string)$newVersion)) {
+                cache('vn-app-version', $newVersion, 60 * 24 * 30); // cập nhật lại cache
+            }
         }
 
         return 'v' . $appVersion;
-    }
-}
-
-if (!function_exists('setAppVersion')) {
-    function setAppVersion(): void
-    {
-        $versionFile = STORAGE_PATH . '/framework/version.txt';
-        $content = trim(get_contents($versionFile));
-        $currentVersion = is_numeric($content) ? (int) $content : 0;
-        $newVersion = $currentVersion + 1;
-        if (put_contents($versionFile, (string)$newVersion)) {
-            cache('vn-app-version', $newVersion, 60 * 24 * 30); // cập nhật lại cache
-        }
     }
 }
