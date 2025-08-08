@@ -163,16 +163,16 @@ dataTableDefaults.columnDefs = [
         targets: "photo",
         render: function (data, type) {
             if (type === 'display' && data && (typeof data === 'string')) {
-                return `<div style="text-align: center;"><img src="${data}" class="img-thumbnail dt-photo dt-img-hover" style="max-height: 80px; cursor: zoom-in;" /></div>`;
+                return `<div style="text-align: center;"><img src="${data}" class="img-thumbnail dt-photo dt-img-hover" style="max-height:60px;cursor: zoom-in;padding:1px;" /></div>`;
             }
             return data;
         }
     },
     {
-        targets: "photo200",
+        targets: "photo120",
         render: function (data, type) {
             if (type === 'display' && data && (typeof data === 'string')) {
-                return `<div style="text-align: center;"><img src="${data}" class="img-thumbnail dt-photo dt-img-hover" style="max-height: 200px; cursor: zoom-in;" /></div>`;
+                return `<div style="text-align: center;"><img src="${data}" class="img-thumbnail dt-photo dt-img-hover" style="max-height:120px;cursor: zoom-in;padding:1px;" /></div>`;
             }
             return data;
         }
@@ -252,12 +252,15 @@ $(document).on('draw.dt', function () {
                 if (!image_url) return '';
                 const img = document.createElement('img');
                 img.src = image_url;
-                img.style.width = '250px';
-                img.style.height = '250px';
-                img.style.objectFit = 'cover';
+                img.style.maxWidth = '320px';
+                img.style.maxHeight = '320px';
+                img.style.width = 'auto';
+                img.style.height = 'auto';
+                img.style.objectFit = 'contain';
                 img.style.borderRadius = '2px';
                 img.style.boxShadow = '0 1px 1px rgba(200,200,200,0.05)';
                 img.style.border = '1px thin #ddd';
+                img.style.padding = '1px';
                 return img;
             },
             allowHTML: true,

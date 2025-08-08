@@ -313,19 +313,25 @@ class VnConfig extends VnModelBase
         );
     }
 
-    public static function appVersion($update = false){
-        $versionName = cache('core-app-version');
-        if(!$versionName || $update){
-            $versionData = self::where('type', 'app')->where('name', 'version')->first();
-            if($versionData){
-                $versionName = (int) $versionData->data + 1;
-                self::where('id', $versionData->id)->update(['data' => $versionName]);
-            }else{
-                $versionName = 100;
-                self::updateOrCreate(['type' => 'app', 'name' => 'version'], ['type' => 'app', 'name' => 'version', 'data' => $versionName]);
+    public static function appVersion(bool $update = false): string
+    {
+        $cacheKey = 'vn-app-version-update';
+        $version = cache($cacheKey);
+        if (!$version || $update) {
+            $record = self::where('type', 'app')->where('name', 'version')->first();
+            if ($record) {
+                $version = $update ? ((int) $record->data + 1) : (int) $record->data;
+                if ($update) {
+                    $record->update(['data' => $version]);
+                }
+            } else {
+                $version = 100;
+                self::updateOrCreate(['type' => 'app', 'name' => 'version'], ['data' => $version]);
             }
+            cache($cacheKey, $version, 86400);
         }
-        return 'v' . number_format($versionName / 100, 2);
+        return 'v' . number_format($version / 100, 2, '.', '');
     }
+
 
 }

@@ -542,7 +542,7 @@ if(!function_exists('isLocalDomain')){
 if(!function_exists('json_content')){
     function json_content($filename, $associative = true)
     {
-        if(is_file($filename)){ // chỉ đọc nếu thực sự là file
+        if(is_file($filename)){
             return json_decode(file_get_contents($filename), $associative);
         }
         return [];
