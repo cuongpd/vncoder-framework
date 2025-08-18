@@ -29,7 +29,7 @@ class VnCommand
 
     public function saveCommandLog(){
         if(!$this->runInQueue) return;
-        RunConsole::setCommandLog($this->output);
+        RunConsole::setConsoleLogs($this->output);
     }
 
     protected function runComand($command){

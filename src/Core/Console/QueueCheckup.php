@@ -3,6 +3,7 @@
 namespace VnCoder\Core\Console;
 
 use Illuminate\Console\Command;
+use Symfony\Component\Process\Process;
 
 class QueueCheckup extends Command
 {
@@ -25,8 +26,9 @@ class QueueCheckup extends Command
         if (! $pid = $this->getLastQueueListenerPID()) {
             return false;
         }
-        $process = exec("ps -p $pid -opid=,cmd=");
-        return ! empty($process);
+        $process = new Process(['ps', '-p', $pid]);
+        $process->run();
+        return $process->isSuccessful() && str_contains($process->getOutput(), (string) $pid);
     }
 
     private function getLastQueueListenerPID()

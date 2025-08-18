@@ -25,7 +25,7 @@ class QueueConsoleCommand extends Command
             } catch (\Exception $e) {
                 logData('console', "Error running command '{$consoleCommand}': " . $e->getMessage());
             } finally {
-                RunConsole::removeCommand();
+                RunConsole::clearConsole();
             }
         }else{
             logData('console', "Command 'php artisan run {$artisanCommand}' is already running. Skipped.");

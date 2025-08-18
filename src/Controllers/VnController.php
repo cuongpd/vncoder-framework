@@ -24,7 +24,7 @@ class VnController extends Controller
         }else{
             $this->version = VnConfig::appVersion();
         }
-        $this->metaData = VnConfig::getWebConfig();
+        $this->metaData = VnConfig::getConfigData();
         $this->metaData->baseUrl = url();
         $this->metaData->version = $this->version;
         $this->initAssetsCore();

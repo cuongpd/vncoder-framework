@@ -8,85 +8,56 @@ class VnConfig extends VnModelBase
 {
     public $timestamps = false;
     protected $table = '__configs';
-    protected $fillable = ['type', 'input', 'name', 'data', 'description'];
+    protected $fillable = ['type', 'name', 'data', 'description'];
+
+    // Type : 'setting',  'website', 'config', 'core', 'database', 'console'
 
     public const SETTING_KEY = ['name', 'title', 'favicon', 'description', 'keywords', 'logo', 'photo', 'email', 'phone', 'author', 'author_url', 'address', 'copyright', 'about_us', 'facebook', 'twitter', 'youtube', 'instagram', 'gdpr_status', 'gdpr_message', 'privacy_policy'];
 
-    public static function getConfig($key, $default, $description)
-    {
-        $configData = self::getCacheData('config');
-        if ($configData && isset($configData[$key])) {
-            if($configData[$key]['input'] == 'checkbox'){
-                return $configData[$key]['data'] == 1;
-            }else{
-                return $configData[$key]['data'];
-            }
-        }
-        $inputType = self::determineInputType($default);
-        $configDataQuery = self::where('type','config')->where('name', $key)->first();
-        if ($configDataQuery) {
-            self::getCacheData('config', true);
-            return $configDataQuery->input == 'checkbox' ? $configDataQuery->data == 1 : $configDataQuery->data;
-        }
-
-        self::create([
-            'type' => 'config',
-            'name' => $key,
-            'data' => $default,
-            'description' => $description,
-            'input' => $inputType
-        ]);
-
-        return $default;
-    }
-
-    public static function getSiteConfig($key)
-    {
-        $data = self::getCacheData('setting');
-        return isset($data[$key]) ? $data[$key]['data'] : '';
-    }
-
-    public static function getWebConfig($update = false)
-    {
-        return self::getConfigData('setting', $update);
-    }
-
-    public static function getEmbedConfig($update = false)
-    {
-        return self::getConfigData('website', $update);
-    }
-
-    public static function getOptionsConfig($update = false)
-    {
-        return self::getConfigData('options', $update);
-    }
-
-    private static function getConfigData($type, $update = false)
-    {
-        $cacheKey = 'config_info_' . $type;
-        $configData = cache($cacheKey);
-        if (!$configData || $update) {
-            $configData = newObject();
-            $configQuery = self::getCacheData($type, true);
-            if($configQuery){
-                foreach ($configQuery as $key => $item) {
-                    $configData->$key = $item['data'];
+    public static function getConfigData($update = false){
+        $cache_key = 'vn_site_config';
+        $data = cache($cache_key);
+        if (!$data || $update) {
+            $configData = self::where('type', 'setting')->pluck('data', 'name')->toArray();
+            $data = newObject();
+            foreach (self::SETTING_KEY as $item){
+                if (isset($configData[$item])) {
+                    $data->$item = $configData[$item];
+                } else {
+                    $data->$item = '';
                 }
             }
-            cache($cacheKey, $configData, 86400);
+            cache($cache_key, $data, 86400);
         }
-        return $configData;
+        return $data;
     }
 
-
-    public static function getSettingConfigForm()
-    {
-        $formData = [];
-        $dataConfig = self::getQueryData('setting');
-        $settingData = [];
-        foreach ($dataConfig as $item) {
-            $settingData[$item->name] = $item->data;
+    public static function saveConfigData(Request $request){
+        $data = $request->except('__token');
+        foreach ($data as $key => $value) {
+            if (!in_array($key, self::SETTING_KEY)) {
+                continue;
+            }
+            if (in_array($key, ['logo', 'photo', 'favicon']) && $request->hasFile($key)) {
+                $uploadData = VnUploads::photo($request->file($key), 'setting-' . $key);
+                if (!$uploadData['success']) {
+                    flash_message($uploadData['message'], 'danger');
+                    continue;
+                }
+                $value = $uploadData['path'];
+            }
+            self::updateOrCreate(
+                ['type' => 'setting', 'name' => $key],
+                ['data' => $value]
+            );
         }
+        self::getConfigData(true);
+        flash_message('Setting has been updated');
+    }
+
+    public static function getConfigDataFormData(){
+        $formData = [];
+        $settingData = self::where('type', 'setting')->pluck('data', 'name')->toArray();
 
         $formData['name'] = ['label' => 'Tên website', 'col' => 2, 'type' => 'text', 'value' => $settingData['name'] ?? '', 'required' => true, 'maxlength' => 30];
         $formData['title'] = ['label' => 'Tiêu đề trang chủ', 'col' => 4, 'type' => 'text', 'value' => $settingData['title'] ?? '', 'required' => true, 'maxlength' => 80];
@@ -120,34 +91,20 @@ class VnConfig extends VnModelBase
         return $formData;
     }
 
-    public static function saveSettingConfig(Request $request)
+    public static function getDataConfig($update = false)
     {
-        $data = $request->except('__token');
-        foreach ($data as $key => $value) {
-            if (in_array($key, self::SETTING_KEY)) {
-                if ($key == 'logo' || $key == 'photo' || $key == 'favicon') {
-                    if ($request->hasFile($key)) {
-                        $uploadData = VnUploads::photo($request->file($key), 'setting-' . $key);
-                        if ($uploadData['success']) {
-                            $value = $uploadData['path'];
-                            self::updateOrCreate(['type' => 'setting', 'name' => $key], ['data' => $value]);
-                        } else {
-                            flash_message($uploadData['message'], 'danger');
-                        }
-                    }
-                } else {
-                    self::updateOrCreate(['type' => 'setting', 'name' => $key], ['data' => $value]);
-                }
-            }
+        $cache_key = 'vn_data_config';
+        $data = cache($cache_key);
+        if (!$data || $update) {
+            $data = self::where('type', 'config')->pluck('data', 'name')->toArray();
+            cache($cache_key, $data, 86400);
         }
-        self::updateCacheData('setting');
-        flash_message('Setting has been updated', 'success');
+        return $data;
     }
 
-    public static function getDataConfigForm()
-    {
+    public static function getDataConfigFormData(){
         $formData = [];
-        $dataConfig = self::getQueryData('config');
+        $dataConfig = self::where('type', 'config')->get();
         if ($dataConfig) {
             foreach ($dataConfig as $item) {
                 $description = $item->description;
@@ -155,7 +112,7 @@ class VnConfig extends VnModelBase
                     $description = str_replace('_', ' ', $item->name);
                     $description = ucwords(str_replace('-', ' ', $description));
                 }
-                $formData[$item->name] = ['label' => $description, 'col' => 12, 'type' => $item->input, 'value' => $item->data, 'required' => '', 'placeholder' => $description];
+                $formData[$item->name] = ['label' => $description, 'col' => 12, 'type' => 'text', 'value' => $item->data, 'required' => '', 'placeholder' => $description];
             }
         }
         return $formData;
@@ -165,16 +122,43 @@ class VnConfig extends VnModelBase
     {
         $data = $request->except('__token');
         foreach ($data as $key => $value) {
-            self::updateOrCreate(['type' => 'config', 'name' => $key], ['type' => 'config', 'name' => $key, 'data' => $value]);
+            self::updateOrCreate(
+                ['type' => 'config', 'name' => $key],
+                ['type' => 'config', 'name' => $key, 'data' => $value, 'description' => $key]
+            );
         }
-        self::getCacheData('config', true);
-        flash_message('Setting has been updated', 'success');
+        self::getDataConfig(true);
+        flash_message('Data config has been updated');
     }
 
-    public static function getExtraConfigForm()
+    public static function getWebsiteConfig($update = false)
+    {
+        $cache_key = 'vn_website_data';
+        $data = cache($cache_key);
+        if (!$data || $update) {
+            $data = self::where('type', 'website')->pluck('data', 'name')->toArray();
+            cache($cache_key, $data, 86400);
+        }
+        return $data;
+    }
+
+    public static function saveWebsiteConfig(Request $request)
+    {
+        $data = $request->except('__token');
+        foreach ($data as $key => $value) {
+            self::updateOrCreate(
+                ['type' => 'website', 'name' => $key],
+                ['type' => 'website', 'name' => $key, 'data' => $value, 'description' => $key]
+            );
+        }
+        self::getWebsiteConfig(true);
+        flash_message('Website meta data has been updated');
+    }
+
+    public static function getWebsiteConfigFormData()
     {
         $formData = [];
-        $dataConfig = self::getQueryData('website');
+        $dataConfig = self::where('type', 'website')->get();
         if ($dataConfig) {
             foreach ($dataConfig as $item) {
                 $formData[$item->name] = ['label' => $item->description, 'col' => 6, 'type' => 'textarea', 'rows' => 12, 'value' => $item->data, 'required' => ''];
@@ -183,45 +167,30 @@ class VnConfig extends VnModelBase
         return $formData;
     }
 
-    public static function saveExtraConfig(Request $request)
-    {
-        $data = $request->all();
-        unset($data['__token']);
-        foreach ($data as $key => $value) {
-            self::updateOrCreate(['type' => 'website', 'name' => $key], ['type' => 'website', 'name' => $key, 'data' => $value]);
-        }
-        self::updateCacheData('website');
-        flash_message('Setting has been updated', 'success');
-    }
 
     public static function getMaintenanceData($update = false)
     {
-        if(!$update){
-            $maintenanceData = self::getConfigData('maintenance');
-            $status = $maintenanceData->status ?? 0;
-            $heading = $maintenanceData->heading ?? '';
-            $message = $maintenanceData->message ?? '';
-        }else{
-            $maintenanceData = self::select('name', 'data')->where('type', 'maintenance')->pluck('data', 'name');
-            $status = $maintenanceData['status'] ?? 0;
-            $heading = $maintenanceData['heading'] ?? '';
-            $message = $maintenanceData['message'] ?? '';
+        $cacheKey = 'vn_maintenance_data';
+        $data = cache($cacheKey);
+        if(!$data || $update){
+            $maintenanceData = self::where('type', 'core')->where('name', 'maintenance')->first();
+            if ($maintenanceData) {
+                $maintenanceData = json_decode($maintenanceData->data, true);
+                $data = [
+                    'status' => $maintenanceData['status'] ?? 0,
+                    'heading' => $maintenanceData['heading'] ?? '',
+                    'message' => $maintenanceData['message'] ?? ''
+                ];
+            } else {
+                $data = [
+                    'status' => 0,
+                    'heading' => '',
+                    'message' => ''
+                ];
+            }
+            cache($cacheKey, $data, 86400);
         }
-        return [
-            'status' => $status,
-            'heading' => $heading,
-            'message' => $message
-        ];
-    }
-
-    public static function getMaintenanceConfigForm()
-    {
-        $maintenanceData = self::getMaintenanceData();
-        return [
-            'status' => ['label' => '', 'col' => 12, 'type' => 'checkbox', 'value' => $maintenanceData['status'], 'required' => '', 'placeholder' => 'Bật chế độ bảo trì website'],
-            'heading' => ['label' => 'Tiêu đề thông báo', 'col' => 12, 'type' => 'text', 'value' => $maintenanceData['heading'], 'required' => ''],
-            'message' => ['label' => 'Nội dung thông báo', 'col' => 12, 'type' => 'editor', 'value' => $maintenanceData['message'], 'required' => ''],
-        ];
+        return $data;
     }
 
     public static function saveMaintenanceConfig(Request $request)
@@ -229,88 +198,28 @@ class VnConfig extends VnModelBase
         $status = $request->input('status', 0);
         $message = $request->input('message', '');
         $heading = $request->input('heading', '');
+
+        $maintenanceData = [
+            'status' => $status,
+            'heading' => $heading,
+            'message' => $message
+        ];
         self::updateOrCreate(
-            ['type' => 'maintenance', 'name' => 'status'],
-            ['type' => 'maintenance', 'name' => 'status', 'data' => $status]
+            ['type' => 'core', 'name' => 'maintenance'],
+            ['type' => 'core', 'name' => 'maintenance', 'data' => json_encode($maintenanceData)]
         );
-        self::updateOrCreate(
-            ['type' => 'maintenance', 'name' => 'heading'],
-            ['type' => 'maintenance', 'name' => 'heading', 'data' => $heading]
-        );
-        self::updateOrCreate(
-            ['type' => 'maintenance', 'name' => 'message'],
-            ['type' => 'maintenance', 'name' => 'message', 'data' => $message]
-        );
-
-        self::updateCacheData('maintenance');
-        flash_message('Setting has been updated');
-    }
-    
-    public static function getQueryData($type)
-    {
-        return self::where('type', $type)->get();
+        self::getMaintenanceData(true);
+        flash_message('Maintenance mode has been updated');
     }
 
-    private static function getCacheData($type, $update = false)
-    {
-        $cacheKey = 'config_data_' . $type;
-        $configData = cache($cacheKey);
-        if (!$configData || $update) {
-            $configQueryData = self::getQueryData($type);
-            foreach ($configQueryData as $item) {
-                $configData[$item->name] = [
-                    'data' => $item->data,
-                    'input' => $item->input,
-                    'description' => $item->description
-                ];
-            }
-            cache($cacheKey, $configData, 86400);
-        }
-        return $configData;
-    }
-
-    private static function updateCacheData($type)
-    {
-        self::getCacheData($type, true);
-        self::getConfigData($type, true);
-    }
-
-    private static function determineInputType($default)
-    {
-        if (is_bool($default)) {
-            return 'checkbox';
-        }
-        if (is_numeric($default)) {
-            return 'number';
-        }
-        if (is_string($default) && strlen($default) > 20) {
-            return 'textarea';
-        }
-        return 'text';
-    }
-
-    public static function deleteConsole($name)
-    {
-        return self::where('type', 'console')->where('name', $name)->delete();
-    }
-
-    public static function deleteConsoleData()
-    {
-        return self::where('type', 'console')->delete();
-    }
-
-    public static function getConsoleData($name, $decode = true)
-    {
-        $data = self::where('type', 'console')->where('name', $name)->first();
-        return $decode && $data ? json_decode($data->data, true) : ($data->data ?? []);
-    }
-
-    public static function setConsoleData($name, $value, $encode = true)
-    {
-        return VnConfig::updateOrCreate(
-            ['type' => 'console', 'name' => $name],
-            ['type' => 'console', 'name' => $name, 'data' => $encode ? json_encode($value) : $value]
-        );
+    public static function getMaintenanceConfigFormData(){
+        $data = self::where('type', 'core')->where('name', 'maintenance')->first();
+        $maintenanceData = $data ? json_decode($data->data, true) : [];
+        return [
+            'status' => ['label' => '', 'col' => 12, 'type' => 'checkbox', 'value' => $maintenanceData['status'] ?? 0, 'required' => '', 'placeholder' => 'Bật chế độ bảo trì website'],
+            'heading' => ['label' => 'Tiêu đề thông báo', 'col' => 12, 'type' => 'text', 'value' => $maintenanceData['heading'] ?? '', 'required' => ''],
+            'message' => ['label' => 'Nội dung thông báo', 'col' => 12, 'type' => 'editor', 'value' => $maintenanceData['message'] ?? '', 'required' => ''],
+        ];
     }
 
     public static function appVersion(bool $update = false): string
@@ -318,7 +227,7 @@ class VnConfig extends VnModelBase
         $cacheKey = 'vn-app-version-update';
         $version = cache($cacheKey);
         if (!$version || $update) {
-            $record = self::where('type', 'app')->where('name', 'version')->first();
+            $record = self::where('type', 'core')->where('name', 'version')->first();
             if ($record) {
                 $version = $update ? ((int) $record->data + 1) : (int) $record->data;
                 if ($update) {
@@ -326,11 +235,94 @@ class VnConfig extends VnModelBase
                 }
             } else {
                 $version = 100;
-                self::updateOrCreate(['type' => 'app', 'name' => 'version'], ['data' => $version]);
+                self::updateOrCreate(['type' => 'core', 'name' => 'version'], ['data' => $version]);
             }
             cache($cacheKey, $version, 86400);
         }
         return 'v' . number_format($version / 100, 2, '.', '');
+    }
+
+
+    public static function getConfig($key, $default, $description)
+    {
+        $dataConfig = self::getDataConfig();
+        if (isset($dataConfig[$key])) {
+            return $dataConfig[$key]['data'];
+        }else{
+            self::updateOrCreate(
+                ['type' => 'config', 'name' => $key],
+                ['type' => 'config', 'name' => $key, 'data' => $default, 'description' => $description]
+            );
+            self::getDataConfig(true);
+        }
+        return $default;
+    }
+
+    public static function getSiteConfig($name){
+        $configData = self::getConfigData();
+        return $configData->$name ?? '';
+    }
+
+
+    public static function clearConsoleData($reset = false)
+    {
+        self::where('type', 'core')->where('name', 'console')->delete();
+        if($reset){
+            self::where('type', 'core')->where('name', 'console-runtime')->delete();
+            self::where('type', 'core')->where('name', 'console-logs')->delete();
+        }
+    }
+
+
+    public static function getCommandData()
+    {
+        $data = self::where('type', 'core')->where('name', 'console')->first();
+        return $data ? unserialize($data->data) : false;
+    }
+
+    public static function setCommandData($data)
+    {
+        return self::updateOrCreate(
+            ['type' => 'core', 'name' => 'console'],
+            ['type' => 'core', 'name' => 'console', 'data' => serialize($data)]
+        );
+    }
+
+    public static function getConsoleLog($name = 'console-log'){
+        $data = self::where('type', 'core')->where('name', $name)->first();
+        return $data ? $data->data : '';
+    }
+
+    public static function setConsoleLogs($message)
+    {
+        self::updateOrCreate(
+            ['type' => 'core', 'name' => 'console-runtime'],
+            ['type' => 'core', 'name' => 'console-runtime', 'data' => $message]
+        );
+        $data = self::where('type', 'core')->where('name', 'console-logs')->first();
+        if($data){
+            $data->data = $data->data . "\n" . $message;
+            return $data->save();
+        }else{
+            return self::create([
+                'type' => 'core',
+                'name' => 'console-logs',
+                'data' => $message
+            ]);
+        }
+    }
+
+    public static function getData($name = ''){
+        $data = self::where('type', 'database')->where('name', $name)->first();
+        return $data ? json_decode($data->data, true) : [];
+    }
+
+    public static function setData($name, $value, $encode = true)
+    {
+        return VnConfig::updateOrCreate(
+            ['type' => 'database', 'name' => $name],
+            ['type' => 'database', 'name' => $name, 'data' => $encode ? json_encode($value) : $value]
+        );
     }
 
 

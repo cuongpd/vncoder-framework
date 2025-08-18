@@ -14,8 +14,13 @@ class ConsoleController extends BackendController
         $this->metaData->title = 'Run Console';
         $this->setData['listCommand'] =  $this->getListCommand();
         $currentCommand = RunConsole::getCommandData();
-        $this->setData['isConsoleRunning'] = $currentCommand ?? false;
-        $this->setData['currentCommand'] = 'php artisan run ' . ($currentCommand['controller'] ?? '') . ' ' . ($currentCommand['action'] ?? '');
+        if(isset($currentCommand['controller'])){
+            $this->setData['isConsoleRunning'] = true;
+            $this->setData['currentCommand'] = 'php artisan run ' . $currentCommand['controller'] . ' ' . ($currentCommand['action'] ?? '');
+        }else{
+            $this->setData['isConsoleRunning'] = false;
+            $this->setData['currentCommand'] = '';
+        }
         return $this->views('admin.console');
     }
 
@@ -31,7 +36,7 @@ class ConsoleController extends BackendController
 
     public function Run_Data_Action(){
         $currentCommand = RunConsole::getCommandData();
-        if($currentCommand){
+        if(isset($currentCommand['controller'])){
             if($currentCommand['active'] ?? false){
                 $messageData = RunConsole::getMessage(false);
                 return response()->json($messageData);

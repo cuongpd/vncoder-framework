@@ -18,7 +18,7 @@
     </div>
 @endif
 <div class="container mt-4">
-    <div id="data-container" class="mt-3 text-success fw-bold" style="white-space: pre-wrap;"></div>
+    <div id="message-data" class="mt-3 text-success fw-bold" style="white-space: pre-wrap;"></div>
 </div>
 
 
@@ -32,11 +32,11 @@
                 dataType: 'json',
                 success: function(response) {
                     if (response.status === 0) {
-                        $('#data-container').text(response.message);
+                        $('#message-data').text(response.message);
                     } else {
-                        $('#data-container').text(response.message);
+                        $('#message-data').text(response.message);
                         $('#is_console_running').hide();
-                        clearInterval(intervalId);
+                        clearInterval(runtimeId);
                         $('#form-data').show();
                     }
                 },
@@ -47,7 +47,7 @@
             });
         }
         fetchData();
-        intervalId = setInterval(fetchData, 1000);
+        runtimeId = setInterval(fetchData, 1000);
     });
 </script>
 @endpush
