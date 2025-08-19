@@ -247,7 +247,7 @@ class VnConfig extends VnModelBase
     {
         $dataConfig = self::getDataConfig();
         if (isset($dataConfig[$key])) {
-            return $dataConfig[$key]['data'];
+            return $dataConfig[$key];
         }else{
             self::updateOrCreate(
                 ['type' => 'config', 'name' => $key],
