@@ -44,7 +44,8 @@ class ApiRouterController extends Controller
 
     public function Open_Api_Data_Action()
     {
-        $openapi = Generator::scan([API_PATH]);
+        $generator = new Generator();
+        $openapi = $generator->generate([API_PATH]);
         header('Content-Type: application/json; charset=utf-8');
         return $openapi->toJson();
     }

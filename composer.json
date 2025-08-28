@@ -12,8 +12,7 @@
         "laravel/lumen-framework": "^v11.2.0",
         "illuminate/session": "^11.45.0",
         "intervention/image": "^3.11.0",
-        "php-debugbar/php-debugbar": "^2.1",
-        "zircote/swagger-php": "^5.1.0"
+        "php-debugbar/php-debugbar": "^2.1"
     },
     "autoload": {
         "psr-4": {
