@@ -5,7 +5,7 @@ return [
     'except' => [
         'api/*',
         '*ajax*',
-        '*autsh*',
+        '*auth*',
         '*callback*',
         'backend/*.html'
     ],
