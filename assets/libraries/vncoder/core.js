@@ -291,6 +291,11 @@ vncoder.ajax = function(toUri, ajaxData, callback, method = 'GET') {
     });
 };
 
+vncoder.logout = function(){
+	localStorage.setItem("cAuth.remove", 1);
+	window.location.assign(BASE_URL + 'auth/logout.html');
+}
+
 
 vncoder.showModal = function (title, content, options = {}) {
     let modal = document.createElement('div');

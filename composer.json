@@ -12,6 +12,7 @@
         "laravel/lumen-framework": "^v11.2.0",
         "illuminate/session": "^11.45.0",
         "intervention/image": "^3.11.0",
+        "kreait/firebase-php": "^7.21",
         "php-debugbar/php-debugbar": "^2.1"
     },
     "autoload": {

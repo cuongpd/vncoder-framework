@@ -13,6 +13,7 @@ class VnConfig extends VnModelBase
     // Type : 'setting',  'website', 'config', 'core', 'database', 'console'
 
     public const SETTING_KEY = ['name', 'title', 'favicon', 'description', 'keywords', 'logo', 'photo', 'email', 'phone', 'author', 'author_url', 'address', 'copyright', 'about_us', 'facebook', 'twitter', 'youtube', 'instagram', 'gdpr_status', 'gdpr_message', 'privacy_policy'];
+    public const AUTH_PROVIDERS = ["google", "facebook", "apple", "github", "twitter", "microsoft"];
 
     public static function getConfigData($update = false){
         $cache_key = 'vn_site_config';
@@ -323,6 +324,58 @@ class VnConfig extends VnModelBase
             ['type' => 'database', 'name' => $name],
             ['type' => 'database', 'name' => $name, 'data' => $encode ? json_encode($value) : $value]
         );
+    }
+
+    public static function authConfigData(){
+        $resultData = [];
+        $authConfigData = self::where('type', 'auth')->pluck('data', 'name')->toArray();
+        $resultData['info_text'] = $authConfigData['info_text'] ?? '';
+        $resultData['welcome_text'] = $authConfigData['welcome_text'] ?? '';
+        $resultData['firebase_version'] = $authConfigData['firebase_version'] ?? '';
+        $resultData['firebase_service_account_key'] = $authConfigData['firebase_service_account_key'] ?? '';
+        $resultData['firebase_config'] = $authConfigData['firebase_config'] ?? '';
+        $resultData['firebase_sign_in_providers'] = isset($authConfigData['firebase_sign_in_providers']) ? json_decode($authConfigData['firebase_sign_in_providers'], true) : [];
+        return $resultData;
+    }
+
+    public static function saveAuthConfig(Request $request){
+        if($firebase_version = $request->input('firebase_version')){
+            self::updateOrCreate(
+                ['type' => 'auth', 'name' => 'firebase_version'],
+                ['type' => 'auth', 'name' => 'firebase_version', 'data' => $firebase_version]
+            );
+        }
+        if($firebase_service_account_key = $request->input('firebase_service_account_key')){
+            self::updateOrCreate(
+                ['type' => 'auth', 'name' => 'firebase_service_account_key'],
+                ['type' => 'auth', 'name' => 'firebase_service_account_key', 'data' => $firebase_service_account_key]
+            );
+            file_put_contents(storage_path(env('FIREBASE_SERVICE_ACCOUNT_PATH', 'app/firebase-service-account.json')), $firebase_service_account_key);
+        }
+        if($firebase_config = $request->input('firebase_config')){
+            self::updateOrCreate(
+                ['type' => 'auth', 'name' => 'firebase_config'],
+                ['type' => 'auth', 'name' => 'firebase_config', 'data' => $firebase_config]
+            );
+        }
+        $firebase_sign_in_providers = $request->input('firebase_sign_in_providers', []);
+        self::updateOrCreate(
+            ['type' => 'auth', 'name' => 'firebase_sign_in_providers'],
+            ['type' => 'auth', 'name' => 'firebase_sign_in_providers', 'data' => json_encode($firebase_sign_in_providers)]
+        );
+        if($info_text = $request->input('info_text', '')){
+            self::updateOrCreate(
+                ['type' => 'auth', 'name' => 'info_text'],
+                ['type' => 'auth', 'name' => 'info_text', 'data' => $info_text]
+            );
+        }
+        if($welcome_text = $request->input('welcome_text', '')){
+            self::updateOrCreate(
+                ['type' => 'auth', 'name' => 'welcome_text'],
+                ['type' => 'auth', 'name' => 'welcome_text', 'data' => $welcome_text]
+            );
+        }
+        flash_message('Authentication config has been updated');
     }
 
 

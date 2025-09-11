@@ -51,6 +51,7 @@
                     <li class="pc-item"><a href="{{backend('core-setting.website')}}" class="pc-link"> Embed Code </a></li>
                     <li class="pc-item"><a href="{{backend('core-page')}}" class="pc-link"> Trang Tĩnh </a></li>
                     <li class="pc-item"><a href="{{backend('core-setting.data')}}" class="pc-link"> Cài đặt dữ liệu </a></li>
+                    <li class="pc-item"><a href="{{backend('core-setting.login-config')}}" class="pc-link"> Cài đặt đăng nhập </a></li>
                     <li class="pc-item"><a href="{{backend('core-setting.maintenance-mode')}}" class="pc-link"> Chế độ bảo trì </a></li>
                     <li class="pc-item"><a href="{{backend('core-users')}}" class="pc-link"> Quản trị viên </a></li>
                 </ul>

@@ -29,8 +29,8 @@ class BootstrapProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->app->make('config')->set('services', require VNCODER_CORE_PATH . 'configs' . DIRECTORY_SEPARATOR . 'services.php');
-        $this->app->make('config')->set('session', require VNCODER_CORE_PATH . 'configs'. DIRECTORY_SEPARATOR .'session.php');
+        $this->app->make('config')->set('services', require VNCODER_CORE_PATH . 'configs' .  DIRECTORY_SEPARATOR. 'services.php');
+        $this->app->make('config')->set('session', require VNCODER_CORE_PATH . 'configs' .  DIRECTORY_SEPARATOR. 'session.php');
 
         $this->app->singleton(
             \Illuminate\Contracts\Debug\ExceptionHandler::class,
@@ -44,7 +44,7 @@ class BootstrapProvider extends ServiceProvider
             $this->registerRouter();
 
             if (cookie('__debugbar') === 'on') {
-                $this->app->make('config')->set('debugbar', require VNCODER_CORE_PATH . 'configs/debugbar.php');
+                $this->app->make('config')->set('debugbar', require VNCODER_CORE_PATH . 'configs' .  DIRECTORY_SEPARATOR. 'debugbar.php');
                 $this->app->register(Debugbar\LumenServiceProvider::class);
             }
         }
@@ -87,7 +87,6 @@ class BootstrapProvider extends ServiceProvider
             $router->post('{controller:[a-z][a-z0-9-]*}[/{action:[a-z0-9-]+}]', 'VnCoder\Core\Router\ApiRouterController@runApiControllerAction');
         });
 
-
         // Backend Router
         $this->app->router->get('backend/login.html',           [ 'as' => 'backend.login',          'uses' => 'VnCoder\Backend\Auth\AuthController@Login_Action']);
         $this->app->router->get('backend/logout.html',          [ 'as' => 'backend.logout',         'uses' => 'VnCoder\Backend\Auth\AuthController@Logout_Action']);
@@ -105,16 +104,15 @@ class BootstrapProvider extends ServiceProvider
         });
 
         // Auth Router
-        $this->app->router->get('auth/login.html',           [ 'as' => 'auth.login',          'uses' => 'VnCoder\Core\Router\AuthController@Login_Action']);
-        $this->app->router->get('auth/register.html',        [ 'as' => 'auth.register',          'uses' => 'VnCoder\Core\Router\AuthController@Register_Action']);
-        $this->app->router->get('auth/logout.html',          [ 'as' => 'auth.logout',         'uses' => 'VnCoder\Core\Router\AuthController@Logout_Action']);
-        $this->app->router->get('auth/reset-password.html',  [ 'as' => 'auth.reset-password', 'uses' => 'VnCoder\Core\Router\AuthController@Reset_Password_Action']);
-        $this->app->router->post('auth/login.html',     'VnCoder\Core\Router\AuthController@Do_Login_Action');
-        $this->app->router->post('auth/register.html',  'VnCoder\Core\Router\AuthController@Do_Register_Action');
-        $this->app->router->get('auth/modal/{action:[a-z-]+}', 'VnCoder\Core\Router\AuthController@Modal_Action');
-
-        $this->app->router->get('auth/provider/{provider:[a-z0-9-]+}', [ 'as' => 'auth.provider', 'uses' => 'VnCoder\Core\Router\AuthController@Provider_Action']);
-        $this->app->router->get('auth/provider/{provider:[a-z0-9-]+}/callback', [ 'as' => 'auth.provider-callback', 'uses' => 'VnCoder\Core\Router\AuthController@Provider_Callback_Action']);
+        $this->app->router->get('auth/login.html',           [ 'as' => 'auth.login',          'uses' => 'VnCoder\Controllers\AuthController@Login_Action']);
+        $this->app->router->get('auth/logout.html',          [ 'as' => 'auth.logout',         'uses' => 'VnCoder\Controllers\AuthController@Logout_Action']);
+        $this->app->router->get('auth/register.html',        [ 'as' => 'auth.register',       'uses' => 'VnCoder\Controllers\AuthController@Register_Action']);
+        $this->app->router->get('auth/reset-password.html',  [ 'as' => 'auth.reset-password', 'uses' => 'VnCoder\Controllers\AuthController@Reset_Password_Action']);
+        $this->app->router->get('auth/logout.html',          [ 'as' => 'auth.logout',         'uses' => 'VnCoder\Controllers\AuthController@Logout_Action']);
+        $this->app->router->post('auth/login.html',         'VnCoder\Controllers\AuthController@Do_Login_Action');
+        $this->app->router->post('auth/register.html',      'VnCoder\Controllers\AuthController@Do_Register_Action');
+        $this->app->router->post('auth/reset-password.html','VnCoder\Controllers\AuthController@Do_Reset_Password_Action');
+        $this->app->router->post('auth/session', 'VnCoder\Controllers\AuthController@Session_Action_Submit');
 
         $this->app->router->group(['namespace' => 'App\Controllers', 'middleware' => 'website'], static function ($router) {
             $router->get('/', [ 'as' => 'home', 'uses' => 'HomeController@Index_Action']);

@@ -38,7 +38,7 @@ class DebugbarViewEngine implements Engine
         $basePath = base_path();
         $shortPath = @file_exists((string) $path) ? realpath($path) : $path;
 
-        if (strpos($shortPath, $basePath) === 0) {
+        if (str_starts_with($shortPath, $basePath)) {
             $shortPath = ltrim(
                 str_replace('\\', '/', substr($shortPath, strlen($basePath))),
                 '/'

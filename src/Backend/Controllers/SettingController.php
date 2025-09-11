@@ -3,6 +3,7 @@
 namespace VnCoder\Backend\Controllers;
 
 use VnCoder\Backend\Controllers\BackendController;
+use VnCoder\Backend\Models\AuthConfig;
 use VnCoder\Models\VnConfig;
 use Illuminate\Http\Request;
 
@@ -54,11 +55,6 @@ class SettingController extends BackendController
         return $this->redirectUrl('maintenance-mode');
     }
 
-
-
-
-
-
     public function Data_Action()
     {
         $this->metaData->title = "Thay đổi dữ liệu Website";
@@ -71,6 +67,20 @@ class SettingController extends BackendController
     {
         VnConfig::saveDataConfig($request);
         return $this->redirectUrl('data');
+    }
+
+
+    public function Login_Config_Action(){
+        $this->metaData->title = "Cấu hình đăng nhập";
+        $this->usingFormEditor = true;
+        $this->setData['settingForm'] = VnConfig::authConfigData();
+        $this->setData['authProviders'] = VnConfig::AUTH_PROVIDERS;
+        return $this->views('setting.login-config');
+    }
+
+    public function Login_Config_Action_Submit(Request $request){
+        VnConfig::saveAuthConfig($request);
+        return $this->redirectUrl('login-config');
     }
 
 

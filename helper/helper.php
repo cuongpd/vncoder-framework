@@ -580,7 +580,6 @@ if (!function_exists('put_contents')) {
     }
 }
 
-
 if(!function_exists('encryptData')){
     function encryptData($data){
         return base64_encode(serialize($data));
