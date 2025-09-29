@@ -102,6 +102,8 @@
                 case "facebook": provider = new firebase.auth.FacebookAuthProvider(); break;
                 case "twitter":  provider = new firebase.auth.TwitterAuthProvider(); break;
                 case "github":   provider = new firebase.auth.GithubAuthProvider(); break;
+                case "microsoft":provider = new firebase.auth.OAuthProvider('microsoft.com'); break;
+                case "apple":    provider = new firebase.auth.OAuthProvider('apple.com'); break;
                 default: throw new Error("Unsupported provider: " + providerName);
             }
             vncoder.showLoading();

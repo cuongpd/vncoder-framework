@@ -51,8 +51,9 @@ if (!function_exists('formatNumberText')) {
 if (!function_exists('formatNumber')) {
     function formatNumber($number)
     {
-        if (!is_numeric($number)) return $number;
+        if (!is_numeric($number)) return '';
         $abs = abs($number);
+        if($abs == 0) return '';
         $decimals = ($abs > 1000) ? 0 : (($abs > 100) ? 1 : (($abs > 10) ? 2 : 3));
         return number_format($number, $decimals);
     }

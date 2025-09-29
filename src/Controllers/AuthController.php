@@ -2,6 +2,7 @@
 
 namespace VnCoder\Controllers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Laravel\Lumen\Routing\Controller;
 use VnCoder\Models\VnConfig;
 use VnCoder\Models\VnUser;

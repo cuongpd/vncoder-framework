@@ -72,6 +72,6 @@
     </div>
 </div>
 <script type="text/javascript" src="{{core_static('js/bootstrap.min.js')}}?v=5.3.2"></script>
-<script type="text/javascript" src="{{core_static('auth/js/auth.min.js')}}?v=1.0"></script>
+<script type="text/javascript" src="{{core_static('auth/js/auth.min.js')}}?v=1.2"></script>
 </body>
 </html>

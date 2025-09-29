@@ -595,6 +595,29 @@ if(!function_exists('decryptData')){
     }
 }
 
+if(!function_exists('base64UrlDecode')){
+    function base64UrlDecode($input){
+        $replaced = strtr($input, '-_', '+/');
+        $pad = strlen($replaced) % 4;
+        if ($pad) { $replaced .= str_repeat('=', 4 - $pad); }
+        return base64_decode($replaced) ?: '';
+    }
+}
+
+if(!function_exists('parseSignedRequest')){
+    function parseSignedRequest($signedRequest, $appSecret){
+        $parts = explode('.', $signedRequest, 2);
+        if (count($parts) !== 2) { return null; }
+        [$encodedSig, $payload] = $parts;
+        $sig     = base64UrlDecode($encodedSig);
+        $dataRaw = base64UrlDecode($payload);
+        $data    = json_decode($dataRaw, true);
+        if (!is_array($data)) { return null; }
+        $expected = hash_hmac('sha256', $payload, $appSecret, true);
+        if (!hash_equals($expected, $sig)) { return null; }
+        return $data;
+    }
+}
 
 // Debugbar
 if (!function_exists('debugbar')) {

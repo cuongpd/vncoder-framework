@@ -10,8 +10,10 @@
             <li class="pc-h-item pc-sidebar-popup">
                 <a href="#" class="pc-head-link ms-0" id="mobile-collapse"><i class="fa-duotone fa-solid fa-bars fa-24"></i></a>
             </li>
-            <li class="pc-h-item" id="index-title">
-                <h4 class="meta-data-title @if (!empty($topMenuStack)) d-none d-sm-block @endif" id="meta-data-title">{!! $__metaData->title !!}</h4>
+            <li class="pc-h-item @if (!empty($topMenuStack)) d-none d-sm-block @endif" id="index-title">
+                <a href="{{backend('/')}}" title="Dashboard">
+                    <h4 class="meta-data-title" id="meta-data-title">{!! $__metaData->title !!}</h4>
+                </a>
             </li>
         </ul>
     </div>
