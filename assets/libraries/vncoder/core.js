@@ -163,6 +163,12 @@ var vncoder = {
             return store.join('');
         }
     },
+    copyInput : function(el) {
+		el.select();
+        navigator.clipboard.writeText(el.value).then(() => {
+            vncoder.floatText("Text copied",0.6);
+        });
+    },
     copyText : function(codeId) {
         var codeElement = document.getElementById(codeId);
         var codeContent = codeElement.textContent;
@@ -172,7 +178,7 @@ var vncoder = {
         tempTextArea.select();
         document.execCommand('copy');
         document.body.removeChild(tempTextArea);
-        vncoder.floatText("Đã copy : " + codeContent,1);
+        vncoder.floatText("Text copied",0.6);
     },
     floatText : function(message, timeout = 1){
         if (!vncoder.is.string(message)) return;
@@ -265,6 +271,11 @@ vncoder.showMessage = function(message, status = 1, time = 3.5) {
             }
         });
     }, time * 1000);
+}
+
+vncoder.gotoUrl = function(url, loadingMessage = 'Loading page...') {
+	vncoder.showLoading(loadingMessage);
+	window.location.href = url;
 }
 
 vncoder.ajax = function(toUri, ajaxData, callback, method = 'GET') {

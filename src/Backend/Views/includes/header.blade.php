@@ -11,9 +11,7 @@
                 <a href="#" class="pc-head-link ms-0" id="mobile-collapse"><i class="fa-duotone fa-solid fa-bars fa-24"></i></a>
             </li>
             <li class="pc-h-item @if (!empty($topMenuStack)) d-none d-sm-block @endif" id="index-title">
-                <a href="{{backend('/')}}" title="Dashboard">
-                    <h4 class="meta-data-title" id="meta-data-title">{!! $__metaData->title !!}</h4>
-                </a>
+                <h4 class="meta-data-title" id="meta-data-title" onclick="return vncoder.gotoUrl('{{backend('/')}}', 'Đang tải trang...');">{!! $__metaData->title !!}</h4>
             </li>
         </ul>
     </div>
