@@ -260,6 +260,12 @@ if (!function_exists('formBuilderManager')) {
                 case 'password':
                     $html .= '<input type="password" class="form-control form-control-sm border" id="' . $key . '" name="' . $key . '" value="' . $item['value'] . '" ' . $item['required'] . '>';
                     break;
+                case 'checkbox2':
+                    foreach ($item['options'] as $o_value => $o_label) {
+                        $checked = in_array($o_value, (array)$item['value']) ? 'checked' : '';
+                        $html .= '<div class="form-check form-check-inline"><input type="checkbox" class="form-control form-check-input input-primary" id="' . $key . '-' . $o_value . '" name="' . $key . '[]" value="' . $o_value . '" ' . $checked . '> <label class="form-control-sm form-check-label" for="' . $key . '-' . $o_value . '">' . $o_label . '</label></div>';
+                    }
+                    break;
                 default:
                     $maxlength = isset($item['maxlength']) ? (int)$item['maxlength'] : 0;
                     $htmlExtra = $maxlength ? 'class="form-control form-control-sm border input-maxlength" maxlength="' . $maxlength . '"' : 'class="form-control form-control-sm border"';
