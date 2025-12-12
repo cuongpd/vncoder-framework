@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 <link href="{{core_static('css/style.css')}}?v=1.22" rel="stylesheet" type="text/css" />
+<link href="{{core_static('css/app.css')}}?v={{TIME_NOW}}" rel="stylesheet" type="text/css" />
 {!! $__extraHeaderCSS !!}
 <script>const BASE_URL = "{{BASE_URL}}", API_URL = "{{BASE_URL}}api/", BACKEND_URL = "{{BASE_URL}}backend/", CURRENT_URL = "{{$__currentUrl}}", PARENT_URL = "{{$__parentBackendUrl}}", CSRF_TOKEN = "{{csrf_token()}}",  TIME_NOW = {{TIME_NOW}};</script>
 {!! $__extraHeaderJS !!}

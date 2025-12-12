@@ -3,20 +3,20 @@
 @endphp
 <div class="header-wrapper">
     <div class="me-auto pc-mob-drp">
-        <ul class="list-unstyled">
+        <ul class="list-unstyled header-flex">
             <li class="pc-h-item pc-sidebar-collapse">
                 <a href="#" class="pc-head-link ms-0" id="sidebar-hide"><i class="fa-duotone fa-solid fa-bars fa-24"></i></a>
             </li>
             <li class="pc-h-item pc-sidebar-popup">
                 <a href="#" class="pc-head-link ms-0" id="mobile-collapse"><i class="fa-duotone fa-solid fa-bars fa-24"></i></a>
             </li>
-            <li class="pc-h-item @if (!empty($topMenuStack)) d-none d-sm-block @endif" id="index-title">
+            <li class="pc-h-item {{ !empty($topMenuStack) ? 'd-none d-sm-block has-menu-stack center-vertical' : '' }}">
                 <h4 class="meta-data-title" id="meta-data-title" onclick="return vncoder.gotoUrl('{{backend('/')}}', 'Đang tải trang...');">{!! $__metaData->title !!}</h4>
             </li>
         </ul>
     </div>
     <div class="ms-auto">
-        <ul class="list-unstyled">
+        <ul class="list-unstyled header-flex">
             @if (!empty($topMenuStack))
                 <li class="pc-h-item">
                     <div class="menu-item">

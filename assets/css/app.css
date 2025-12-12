@@ -1,0 +1,9 @@
+.has-menu-stack {
+    display: flex!important;
+    align-items: center;
+}
+
+#meta-data-title {
+    margin: 0;
+    line-height: 1.2;
+}
