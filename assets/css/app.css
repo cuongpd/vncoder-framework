@@ -3,7 +3,18 @@
     align-items: center;
 }
 
-#meta-data-title {
-    margin: 0;
+.meta-data-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     line-height: 1.2;
+    max-width: 720px;
+    cursor: default;
 }
+
+@media (max-width: 768px) {
+    .meta-data-title {
+        max-width: 200px;
+    }
+}
+
