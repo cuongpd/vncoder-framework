@@ -5,7 +5,7 @@
     "license": "MIT",
     "homepage": "https://nhatky.date",
     "authors": [
-        {"name": "Nam Pham", "email": "vncoder@gmail.com"}
+        {"name": "Cuong Pham", "email": "vncoder90@gmail.com"}
     ],
     "require": {
         "php": "^8.2",
