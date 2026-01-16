@@ -194,7 +194,7 @@ class AuthController extends Controller
     public function Session_Action_Submit(Request $request){
         $idTokenString = $request->input('idToken');
         if (!$idTokenString) return response()->json([ 'error' => 'Missing idToken' ], 422);
-        $auth = (new Factory())->withServiceAccount( storage_path(env('FIREBASE_SERVICE_ACCOUNT_PATH', 'app/firebase-service-account.json')))->createAuth();
+        $auth = (new Factory())->withServiceAccount( storage_path(env('FIREBASE_SERVICE_ACCOUNT_PATH', 'app/firebase/service-account.json')))->createAuth();
         try {
             $verifiedIdToken = $auth->verifyIdToken($idTokenString);
         } catch (FailedToVerifyToken $e) {

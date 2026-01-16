@@ -9,8 +9,33 @@ div.phpdebugbar-header{padding-left:0!important}.site-bg{background-image:linear
 .grid-lines .grid-line-3:after{animation:bgLine 7s linear infinite;animation-delay:4s;}
 .grid-lines .grid-line-4:after{animation:bgLine 10s linear infinite;animation-delay:2s;}
 .grid-lines .grid-line-5:after{animation:bgLine 8.5s linear infinite;animation-delay:2s;}
+
+@media all{
+    ::-webkit-scrollbar{background-color:rgba(25,25,25,.1);width:8px;height:8px;}
+    ::-webkit-scrollbar-thumb{background-color:rgba(25,25,25,.8);border-radius:6px;-webkit-transition:background .2s ease;transition:background .2s ease;}
+    .tiny-scrollbar-beautify ::-webkit-scrollbar{width:10px;height:10px;}
+    .tiny-scrollbar-beautify ::-webkit-scrollbar-thumb{background:linear-gradient(180deg, #3b82f6, #33a1ea);border-radius:8px;}
+    .tiny-scrollbar-beautify ::-webkit-scrollbar-track{background:#f1f5f9;}
+    .tiny-hero-bg-layer{position:absolute;inset:0;z-index:1;overflow:hidden;}
+    .tiny-bg-particles{position:absolute;inset:0;z-index:1;}
+    .style-meteor{background:linear-gradient(to bottom, #020111 10%, #3a3a52 100%);overflow:hidden;z-index: 1}
+    .style-meteor span{position:absolute;top:50%;left:50%;width:4px;height:4px;background:#fff;border-radius:50%;box-shadow:0 0 0 4px rgba(255, 255, 255, 0.1), 0 0 0 8px rgba(255, 255, 255, 0.1), 0 0 20px rgba(255, 255, 255, 1);animation:tinyMeteor 3s linear infinite;}
+    .style-meteor span::before{content:"";position:absolute;top:50%;transform:translateY(-50%);width:300px;height:1px;background:linear-gradient(90deg, #fff, transparent);}
+    .style-meteor span:nth-child(1){top:0;left:0;animation-delay:0s;animation-duration:3s;}
+    .style-meteor span:nth-child(2){top:0;left:20%;animation-delay:1s;animation-duration:4s;}
+    .style-meteor span:nth-child(3){top:0;left:40%;animation-delay:2.5s;animation-duration:3.5s;}
+    .style-meteor span:nth-child(4){top:0;left:60%;animation-delay:0.5s;animation-duration:2.8s;}
+    .style-meteor span:nth-child(5){top:0;left:80%;animation-delay:3s;animation-duration:4.2s;}
+    .style-meteor span:nth-child(6){top:0;left:10%;animation-delay:1.5s;animation-duration:3.2s;}
+    .style-meteor span:nth-child(7){top:0;left:30%;animation-delay:2s;animation-duration:3.8s;}
+    .style-meteor span:nth-child(8){top:0;left:50%;animation-delay:0.8s;animation-duration:2.5s;}
+    .style-meteor span:nth-child(9){top:0;left:70%;animation-delay:2.2s;animation-duration:3.6s;}
+    .style-meteor span:nth-child(10){top:0;left:90%;animation-delay:1.2s;animation-duration:4.5s;}
+}
+
 @media (max-width: 767px){
     .grid-lines .grid-line-4,.grid-lines .grid-line-5{display:none;}
 }
 
+@keyframes tinyMeteor{0%{transform:rotate(315deg) translateX(0);opacity:1;}70%{opacity:1;}100%{transform:rotate(315deg) translateX(-1000px);opacity:0;}}
 @keyframes bgLine{0%{top:-80px;}to{top:100%;}}
