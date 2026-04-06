@@ -89,8 +89,20 @@ class VnCommand
         echo "\n";
     }
 
-    protected function sleep($time = 5){
-        sleep($time);
+    protected function sleep($time = 5, $print = false){
+        if($print){
+            for($i=0;$i<$time;$i++){
+                echo $i. " ";
+                if (ob_get_level()) {
+                    ob_flush();
+                }
+                flush();
+                sleep(1);
+            }
+        }else{
+            sleep($time);    
+        }
+        
     }
 
     public function Index_Action()
