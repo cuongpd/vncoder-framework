@@ -296,22 +296,37 @@ if (!function_exists('display_form_errors')) {
     }
 }
 
-if(!function_exists('getCsvData')){
-    function getCsvData($csvString, $delimiter = ','){
+if (!function_exists('getCsvData')) {
+    function getCsvData($csvString, $delimiter = ',')
+    {
         $csvString = mb_convert_encoding($csvString, 'UTF-8', 'auto');
-        $lines = explode("\n", $csvString);
-        $headers = str_getcsv(array_shift($lines), $delimiter);
-        $array = [];
+        $csvString = preg_replace("/\r\n|\r/", "\n", $csvString);
+        $lines = explode("\n", trim($csvString));
+        if (count($lines) === 0) return [];
+        $rawHeaders = str_getcsv(array_shift($lines), $delimiter);
+        $headers = array_map(function ($key) {
+            $key = preg_replace('/^\xEF\xBB\xBF/', '', $key);
+            $key = trim($key);
+            $key = strtolower($key);
+            $key = str_replace(' ', '_', $key);
+            return $key;
+        }, $rawHeaders);
+
+        $data = [];
+
         foreach ($lines as $line) {
-            if (!empty($line)) {
-                $row = str_getcsv($line, $delimiter);
-                $array[] = array_combine($headers, $row);
+            if (trim($line) === '') continue;
+            $row = str_getcsv($line, $delimiter);
+            if (count($row) !== count($headers)) {
+                continue;
             }
+            $row = array_map('trim', $row);
+            $data[] = array_combine($headers, $row);
         }
-        return $array;
+
+        return $data;
     }
 }
-
 
 if(!function_exists('showCaptcha')){
     function showCaptcha($width = 100){
