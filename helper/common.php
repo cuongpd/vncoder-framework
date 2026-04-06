@@ -296,31 +296,45 @@ if (!function_exists('display_form_errors')) {
     }
 }
 
-if (!function_exists('getCsvData')) {
-    function getCsvData($csvString, $delimiter = ',')
+if (!function_exists('cleanCsvKey')) {
+    function cleanCsvKey(string $key): string
     {
-        $csvString = mb_convert_encoding($csvString, 'UTF-8', 'auto');
+        $key = preg_replace('/^\xEF\xBB\xBF/', '', $key);
+        $key = preg_replace('/^[^a-zA-Z0-9]+/', '', $key);
+        $key = trim($key);
+        $key = strtolower($key);
+        $key = str_replace([' ', '-'], '_', $key);
+
+        return $key;
+    }
+}
+
+if (!function_exists('getCsvData')) {
+    function getCsvData(string $csvString, string $delimiter = ','): array
+    {
+        if (!mb_check_encoding($csvString, 'UTF-8')) {
+            $csvString = mb_convert_encoding($csvString, 'UTF-8', 'auto');
+        }
         $csvString = preg_replace("/\r\n|\r/", "\n", $csvString);
         $lines = explode("\n", trim($csvString));
-        if (count($lines) === 0) return [];
+
+        if (empty($lines)) return [];
         $rawHeaders = str_getcsv(array_shift($lines), $delimiter);
+
         $headers = array_map(function ($key) {
-            $key = preg_replace('/^\xEF\xBB\xBF/', '', $key);
-            $key = trim($key);
-            $key = strtolower($key);
-            $key = str_replace(' ', '_', $key);
-            return $key;
+            return cleanCsvKey($key);
         }, $rawHeaders);
 
         $data = [];
 
-        foreach ($lines as $line) {
+        foreach ($lines as $lineIndex => $line) {
             if (trim($line) === '') continue;
             $row = str_getcsv($line, $delimiter);
             if (count($row) !== count($headers)) {
                 continue;
             }
             $row = array_map('trim', $row);
+
             $data[] = array_combine($headers, $row);
         }
 
