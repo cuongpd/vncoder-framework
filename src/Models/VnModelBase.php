@@ -139,7 +139,6 @@ class VnModelBase extends Model
 {
     public const CREATED_AT = 'created', UPDATED_AT = 'updated';
     protected $primaryKey = 'id';
-    protected $dateFormat = 'U';
     protected int $cacheTime = 0;
 
     protected function newBaseQueryBuilder()
@@ -149,6 +148,17 @@ class VnModelBase extends Model
             return new QueryBuilderWithCache($connection, $connection->getQueryGrammar(), $connection->getPostProcessor(), $this->cacheTime);
         }
         return parent::newBaseQueryBuilder();
+    }
+
+
+    public function setCreatedAttribute($value)
+    {
+        $this->attributes['created'] = time();
+    }
+
+    public function setUpdatedAttribute($value)
+    {
+        $this->attributes['updated'] = time();
     }
 
 

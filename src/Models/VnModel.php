@@ -16,8 +16,6 @@ use VnCoder\Models\VnModelBase;
 class VnModel extends VnModelBase
 {
 
-    public const CREATED_AT = 'created', UPDATED_AT = 'updated';
-    protected $primaryKey = 'id';
     public string $modelName = '';
 
     public function getCreatedDateAttribute(){
@@ -135,17 +133,6 @@ class VnModel extends VnModelBase
     public static function getInfo(int $id = 0)
     {
         return self::where('id', $id)->first();
-    }
-
-
-    public function setCreatedAttribute($value)
-    {
-        $this->attributes['created'] = time();
-    }
-
-    public function setUpdatedAttribute($value)
-    {
-        $this->attributes['updated'] = time();
     }
 
 }
