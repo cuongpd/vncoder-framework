@@ -18,7 +18,6 @@ class VnModel extends VnModelBase
 
     public const CREATED_AT = 'created', UPDATED_AT = 'updated';
     protected $primaryKey = 'id';
-    protected $dateFormat = 'U';
     public string $modelName = '';
 
     public function getCreatedDateAttribute(){
@@ -132,9 +131,21 @@ class VnModel extends VnModelBase
     public function restoreItem($id){
         return $this->where('id', $id)->update(['status' => 1]);
     }
+
     public static function getInfo(int $id = 0)
     {
         return self::where('id', $id)->first();
+    }
+
+
+    public function setCreatedAttribute($value)
+    {
+        $this->attributes['created'] = time();
+    }
+
+    public function setUpdatedAttribute($value)
+    {
+        $this->attributes['updated'] = time();
     }
 
 }
