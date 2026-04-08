@@ -48,10 +48,13 @@ class VnCommand
 
     protected function print($data = null)
     {
+        if (empty($data) ) {
+            return;
+        }
+        $this->endLine();
         if (is_array($data) || is_object($data)) {
             var_dump($data);
             $this->output .= print_r($data, true);
-            $this->endLine();
         } else {
             $this->echo($data);
         }
@@ -66,6 +69,7 @@ class VnCommand
         if (empty($data) ) {
             return;
         }
+        $this->endLine();
         if (!isset($this->tableKey[$key])) {
             $this->tableKey[$key] = $key;
             $keys = array_keys($data);
@@ -73,14 +77,13 @@ class VnCommand
                 return ucfirst($key);
             }, $keys);
             $this->echo(implode("\t", $capitalizedKeys));
-            $this->endLine();
         }
         $this->echo(implode("\t", array_values($data)));
     }
 
     protected function echo($info)
     {
-        echo $info. "\n";
+        echo $info;
         $this->output .= $info . "\n";
     }
 
@@ -92,7 +95,7 @@ class VnCommand
     protected function sleep($time = 5, $print = false){
         if($print){
             for($i=0;$i<$time;$i++){
-                echo $i. " ";
+                echo ".";
                 if (ob_get_level()) {
                     ob_flush();
                 }
