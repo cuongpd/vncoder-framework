@@ -138,9 +138,32 @@ use VnCoder\Core\Query\QueryBuilderWithCache;
 class VnModelBase extends Model
 {
     public const CREATED_AT = 'created', UPDATED_AT = 'updated';
-    protected $dateFormat = 'U';
+    // protected $dateFormat = 'U';
     protected $primaryKey = 'id';
     protected int $cacheTime = 0;
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $time = time();
+
+            if (empty($model->created)) {
+                $model->created = $time;
+            }
+
+            if (empty($model->updated)) {
+                $model->updated = $time;
+            }
+        });
+
+        static::updating(function ($model) {
+            if ($model->isDirty()) {
+                $model->updated = time();
+            }
+        });
+    }
 
     protected function newBaseQueryBuilder()
     {
@@ -158,5 +181,7 @@ class VnModelBase extends Model
     public function getUpdatedDateAttribute(){
         return date('Y-m-d', $this->updated->timestamp);
     }
+
+
 
 }
