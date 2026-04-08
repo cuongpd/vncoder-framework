@@ -18,10 +18,6 @@ class VnModel extends VnModelBase
 
     public string $modelName = '';
 
-    public function getCreatedDateAttribute(){
-        return date('d-m-Y', $this->created->timestamp);
-    }
-
     public function tableData(){
         $tableColumn = $this->getTableColumns();
         $tableData = array_fill_keys($tableColumn, '');
