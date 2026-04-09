@@ -131,4 +131,11 @@ class VnModel extends VnModelBase
         return self::where('id', $id)->first();
     }
 
+    public function scopeWhereEmpty($query, $column)
+    {
+        return $query->where(function ($q) use ($column) {
+            $q->whereNull($column)->orWhere($column, '');
+        });
+    }
+
 }
