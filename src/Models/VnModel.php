@@ -10,6 +10,7 @@ use VnCoder\Models\VnModelBase;
 /**
  * @method $this->scopeSearch search(string $query, string|array $column ) Search $query in $column
  * @method $this->scopeActive active() Check record status > 0
+ * @method static \Illuminate\Database\Eloquent\Builder|$this whereEmpty(string $column) Check Null or Empty $column
  *
  */
 
