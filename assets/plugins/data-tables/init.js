@@ -224,12 +224,6 @@ if (typeof DATATABLE_EXPORT_BUTTON !== 'undefined' && DATATABLE_EXPORT_BUTTON) {
     dataTableDefaults.dom = '<"dt-wrapper-lf"lf><"dt-wrapper-table table-responsive dt-responsive"ti><"dt-wrapper-info"Bp>';
     dataTableDefaults.buttons = [
         {
-            extend: 'print',
-            text: '<i class="fa-duotone fa-solid fa-print"></i> Print',
-            className: 'btn-sm btn-primary m-r-5',
-            autoPrint: true
-        },
-        {
             extend: 'copy',
             text: '<i class="fa-duotone fa-solid fa-copy"></i> Copy',
             className: 'btn-sm btn-info m-r-5'
