@@ -36,15 +36,15 @@ dataTableDefaults.columnDefs = [
                 if(typeof data !== 'number') data = parseFloat(data);
                 if(isNaN(data)) return '';
                 if(Math.abs(data) > 999){
-                    return data.toLocaleString('vi-VN', { maximumFractionDigits: 0 });
+                    return data.toLocaleString('en-US', { useGrouping: false, maximumFractionDigits: 0});
                 }else{
                     if(Math.abs(data) > 1){
-                        return data.toLocaleString('vi-VN', { maximumFractionDigits: 2 });
+                        return data.toLocaleString('en-US', {useGrouping: false, maximumFractionDigits: 2});
                     }else{
                         if(Math.abs(data) > 0.1){
-                            return data.toLocaleString('vi-VN', { maximumFractionDigits: 3 });
+                            return data.toLocaleString('en-US', {useGrouping: false, maximumFractionDigits: 3});
                         }else{
-                             return data.toLocaleString('vi-VN', { maximumFractionDigits: 6 });
+                            return data.toLocaleString('en-US', {useGrouping: false, maximumFractionDigits: 4});
                          }
                     }
                 }
@@ -59,12 +59,12 @@ dataTableDefaults.columnDefs = [
                 if(typeof data !== 'number') data = parseFloat(data);
                 if(isNaN(data)) return '';
                 if(Math.abs(data) > 999){
-                    return data.toLocaleString('vi-VN', { maximumFractionDigits: 1 });
+                    return data.toLocaleString('en-US', { useGrouping: false, maximumFractionDigits: 1});
                 }else{
                     if(Math.abs(data) >= 10){
-                        return data.toLocaleString('vi-VN', { maximumFractionDigits: 3 });
+                        return data.toLocaleString('en-US', {useGrouping: false, maximumFractionDigits: 3});
                     }else{
-                        return data.toLocaleString('vi-VN', { maximumFractionDigits: 4 });
+                        return data.toLocaleString('en-US', {useGrouping: false, maximumFractionDigits: 4});
                     }
                 }
             }
@@ -78,7 +78,7 @@ dataTableDefaults.columnDefs = [
                 if(typeof data !== 'number') data = parseFloat(data);
                 if(isNaN(data) || data <= 0) return '';
                 data = data * 100;
-                return data.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+                return data.toLocaleString('en-US', {useGrouping: false, minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
             }
             return data;
         }
